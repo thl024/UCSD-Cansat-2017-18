@@ -1,0 +1,52 @@
+*
+*******************************************
+*
+*BZX84-A3V6
+*
+*NXP Semiconductors
+*
+*Voltage regulator diode
+*
+*
+*
+*
+* 
+*
+*IR    = 5µA   @ VR = 1V
+*IZSM  = 6A    @ tp = 100µs
+*Vzmax = 3,64V @ IZ = 5mA
+*
+*
+*
+*
+* 
+*
+*
+*Package pinning does not match Spice model pinning.
+*Package: SOT23
+*
+*Package Pin 1: Anode
+*Package Pin 2: not connected
+*Package Pin 3: Cathode
+*
+*
+*
+*Simulator: PSPICE
+*
+*******************************************
+*#
+.MODEL BZX84-A3V6 D
++ IS=110.88E-18
++ N=.92657
++ RS=.85899
++ IKF=147.68
++ CJO=219.21E-12
++ M=.31686
++ VJ=.57426
++ ISR=18.160E-9
++ BV=3.6606
++ IBV=61.478E-3
++ TT=125.51E-9
+*##
+*
+

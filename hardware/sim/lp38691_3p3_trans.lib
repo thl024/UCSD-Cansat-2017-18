@@ -1,0 +1,89 @@
+* PSpice Model Editor - Version 16.2.0
+*$
+* LP38691_3P3
+*****************************************************************************
+* (C) Copyright 2014 Texas Instruments Incorporated. All rights reserved.
+*****************************************************************************
+** This model is designed as an aid for customers of Texas Instruments.
+** TI and its licensors and suppliers make no warranties, either expressed
+** or implied, with respect to this model, including the warranties of
+** merchantability or fitness for a particular purpose. The model is
+** provided solely on an "as is" basis. The entire risk as to its quality
+** and performance is with the customer
+*****************************************************************************
+*
+** Released by: WEBENCH Design Center, Texas Instruments Inc.
+* Part: LP38691_3P3
+* Date: 24MAR2014 
+* Model Type: Transient
+* Simulator: PSPICE
+* Simulator Version: 16.2.0.p001
+* EVM Order Number: 
+* EVM Users Guide:
+* Datasheet: SNVS321K–JANUARY 2005–REVISED APRIL 2013
+*
+* Model Version: Final 1.00
+*
+*****************************************************************************
+*
+* Updates:
+*
+* Final 1.00
+* Release to Web
+*
+*****************************************************************************
+.SUBCKT LP38691_3P3_TRANS IN SNS OUT GND
+R_R6         N242982 VYY  10 TC=0,0 
+C_U1_C2         0 U1_N05382  1n  
+V_U1_V4         U1_N12783 0 {UVLO}
+X_U1_U1         IN U1_N11911 U1_N11626 U1_N11113 COMPHYS_BASIC_GEN PARAMS:
++  VDD=1 VSS=0 VTHRESH=0.5
+E_U1_ABM4         U1_N09035 0 VALUE { V(U1_N05348)  
++ * (ABS(V(OUT)) + 1e-6)  
++ / (ABS(V(N222934)) + 1e-6)  }
+C_U1_C1         0 U1_N05348  {1e-6*SQRT(TTRN)}  
+R_U1_R1         GND U1_N05348  1G  
+X_U1_U2         IN U1_N12783 U1_N12664 U1_N13377 COMPHYS_BASIC_GEN PARAMS:
++  VDD=1 VSS=0 VTHRESH=0.5
+V_U1_V2         U1_N11911 0 {VENB}
+V_U1_V3         U1_N12664 0 {UHYS}
+V_U1_V1         U1_N11626 0 {EHYS}
+R_U1_R5         U1_N09745 N222524  10 TC=0,0 
+R_U1_R3         U1_N08164 U1_N05348  {3.333e5*SQRT(TTRN)} TC=0,0 
+C_U1_C3         0 N222524  1n  
+R_U1_R2         GND U1_N05382  1G  
+E_U1_ABM6         U1_N08164 0 VALUE { IF(V(U1_N13377)> 0.6 & V(U1_N11113) >
++  0.6, {VREF}, 0)    }
+E_U1_ABM5         U1_N09745 0 VALUE { MIN(V(U1_N05382),  
++ MAX(V(IN) - {DROP}, 0))   }
+R_U1_R4         U1_N09035 U1_N05382  10 TC=0,0 
+C_C3         0 VYY  1n  
+E_E1         ILIM 0 TABLE { V(IN, OUT) } 
++ ( (0,850m) (2,850m) (4,850m) (5,350m) )
+R_R5         VZZ VYY  {ROUT}  
+E_ABM1         N242982 0 VALUE { MIN(V(VXX), (V(Vzz)+(V(ILIM)*ROUT)))    }
+R_R1         VXX IN  {RINP}  
+X_F1    VZZ OUT IN VYY LP38691_3P3_F1 
+R_R2         N222524 VXX  {PSRR*RINP}  
+R_R3         GND N222934  30.1k  
+C_C1         VXX IN  {1/(6.28*RINP*POLE)}  
+R_R4         N222934 SNS  49.364k  
+C_C2         VXX N222524  {1/(6.28*PSRR*RINP*ZERO)}  
+.PARAM  psrr=1.7782e-3 uvlo=2.7 venb=0 pole=300 zero=10k rinp=1e7 ttrn=1e-4
++  rout=1e-2 vref=1.25 ehys=0.1 drop=250m uhys=0.1
+.ENDS LP38691_3P3_TRANS
+*$
+.subckt LP38691_3P3_F1 1 2 3 4  
+F_F1         3 4 VF_F1 1
+VF_F1         1 2 0V
+.ends LP38691_3P3_F1
+*$
+.SUBCKT COMPHYS_BASIC_GEN INP INM HYS OUT PARAMS: VDD=1 VSS=0 VTHRESH=0.5	
+EIN INP1 INM1 INP INM 1 
+EHYS INP1 INP2 VALUE { IF( V(1) > {VTHRESH},-V(HYS),0) }
+EOUT OUT 0 VALUE { IF( V(INP2)>V(INM1), {VDD} ,{VSS}) }
+R1 OUT 1 1
+C1 1 0 5n
+RINP1 INP1 0 1K
+.ENDS COMPHYS_BASIC_GEN
+*$

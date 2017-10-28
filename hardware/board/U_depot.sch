@@ -1,0 +1,196 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:U_depot-cache
+EELAYER 25 0
+EELAYER END
+$Descr USLetter 11000 8500
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L D_Schottky D?
+U 1 1 5883CF6D
+P 2750 3700
+F 0 "D?" H 2750 3800 50  0000 C CNN
+F 1 "D_Schottky" H 2750 3600 50  0000 C CNN
+F 2 "" H 2750 3700 50  0000 C CNN
+F 3 "" H 2750 3700 50  0000 C CNN
+	1    2750 3700
+	-1   0    0    1   
+$EndComp
+$Comp
+L R R?
+U 1 1 5883CFC8
+P 3200 3950
+F 0 "R?" V 3280 3950 50  0000 C CNN
+F 1 "R" V 3200 3950 50  0000 C CNN
+F 2 "" V 3130 3950 50  0000 C CNN
+F 3 "" H 3200 3950 50  0000 C CNN
+	1    3200 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L ZENER D?
+U 1 1 5883CFE9
+P 3200 4450
+F 0 "D?" H 3200 4550 50  0000 C CNN
+F 1 "ZENER" H 3200 4350 50  0000 C CNN
+F 2 "" H 3200 4450 50  0000 C CNN
+F 3 "" H 3200 4450 50  0000 C CNN
+	1    3200 4450
+	0    1    1    0   
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 5883D03A
+P 3200 4700
+F 0 "#PWR?" H 3200 4450 50  0001 C CNN
+F 1 "GND" H 3200 4550 50  0000 C CNN
+F 2 "" H 3200 4700 50  0000 C CNN
+F 3 "" H 3200 4700 50  0000 C CNN
+	1    3200 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L OPA376AIDCK U?
+U 1 1 5883D06C
+P 4850 4000
+F 0 "U?" H 4900 4200 50  0000 C CNN
+F 1 "OPA376AIDCK" H 5050 3800 50  0000 C CNN
+F 2 "SC70-5" H 4800 3700 50  0000 L CNN
+F 3 "" H 4900 4200 50  0000 C CNN
+	1    4850 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Q_NPN_BCE Q?
+U 1 1 5883D0DB
+P 5800 4000
+F 0 "Q?" H 6100 4050 50  0000 R CNN
+F 1 "Q_NPN_BCE" H 6400 3950 50  0000 R CNN
+F 2 "" H 6000 4100 50  0000 C CNN
+F 3 "" H 5800 4000 50  0000 C CNN
+	1    5800 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C?
+U 1 1 5883D158
+P 6050 4500
+F 0 "C?" H 6075 4600 50  0000 L CNN
+F 1 "C" H 6075 4400 50  0000 L CNN
+F 2 "" H 6088 4350 50  0000 C CNN
+F 3 "" H 6050 4500 50  0000 C CNN
+	1    6050 4500
+	1    0    0    -1  
+$EndComp
+$Comp
+L D_Schottky D?
+U 1 1 5883D1D1
+P 6650 3950
+F 0 "D?" H 6650 4050 50  0000 C CNN
+F 1 "D_Schottky" H 6650 3850 50  0000 C CNN
+F 2 "" H 6650 3950 50  0000 C CNN
+F 3 "" H 6650 3950 50  0000 C CNN
+	1    6650 3950
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5900 4200 5900 4350
+Wire Wire Line
+	5900 4350 6650 4350
+Wire Wire Line
+	6650 4350 6650 4100
+Connection ~ 6050 4350
+$Comp
+L GND #PWR?
+U 1 1 5883D248
+P 6050 4700
+F 0 "#PWR?" H 6050 4450 50  0001 C CNN
+F 1 "GND" H 6050 4550 50  0000 C CNN
+F 2 "" H 6050 4700 50  0000 C CNN
+F 3 "" H 6050 4700 50  0000 C CNN
+	1    6050 4700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6050 4700 6050 4650
+Wire Wire Line
+	2900 3700 6650 3700
+Wire Wire Line
+	5900 3700 5900 3800
+Wire Wire Line
+	6650 3700 6650 3800
+Connection ~ 5900 3700
+Wire Wire Line
+	5150 4000 5600 4000
+Wire Wire Line
+	4550 4100 4350 4100
+Wire Wire Line
+	4350 4100 4350 3700
+Connection ~ 4750 3700
+Wire Wire Line
+	3200 3700 3200 3800
+Connection ~ 4350 3700
+Connection ~ 3200 3700
+Wire Wire Line
+	3200 4250 3200 4100
+Wire Wire Line
+	3200 4700 3200 4650
+Wire Wire Line
+	4550 3900 3450 3900
+Wire Wire Line
+	3450 3900 3450 4200
+Wire Wire Line
+	3450 4200 3200 4200
+Connection ~ 3200 4200
+$Comp
+L GND #PWR?
+U 1 1 5883D63D
+P 4750 4350
+F 0 "#PWR?" H 4750 4100 50  0001 C CNN
+F 1 "GND" H 4750 4200 50  0000 C CNN
+F 2 "" H 4750 4350 50  0000 C CNN
+F 3 "" H 4750 4350 50  0000 C CNN
+	1    4750 4350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4750 4350 4750 4300
+$EndSCHEMATC
