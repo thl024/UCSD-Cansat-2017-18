@@ -25,9 +25,16 @@ class WindowWrapper():
         self.ui.canvas.setObjectName("gridCanvas")
         self.ui.gridLayout.addWidget(ui.canvas, 0, 0, 1, 1)
 
+    # plot the data
+    """
+    need to use data.astype(float) so it can process the data
+    need ax = self.ui.figure.add_subplot(111) to show the graph
+    set x axis to Time and y axis to altitude
+    """
     def plot(self, data):
         x = data.ix[:,0]
-        plt.plot()
+        data.astype(float).plot(ax = self.ui.figure.add_subplot(111),
+            x = "Time", y = "Altitude")
 
 
 # Instantiate UI
