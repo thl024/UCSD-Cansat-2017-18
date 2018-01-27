@@ -17,6 +17,12 @@ class DataLoader():
         # neatly format data using pandas
         self.data = pd.DataFrame(mat[2:len(mat) - 1], columns=mat[0])
 
+    # Assume all parameters recording
+    def update(self, columns, new_data):
+        if not len(columns) == len(new_data):
+            return False
+        self.data.loc[len(self.data)] = new_data
+
     # access data by passing in column names
     def fetch(self, columns):
         if (columns == "All"):

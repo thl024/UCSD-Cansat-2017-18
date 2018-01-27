@@ -9,6 +9,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
+from random import randint
 
 HEADERS = ["TeamID", "Time", "Packet", "Altitude", "Pressure", "Airspeed", "Temperature", "Voltage", "Latitude", "Longitude",
 "GPSAlt", "Satellites", "GPSSpeed", "Heading", "ImageCount", "State"]
@@ -55,4 +56,9 @@ if __name__ == "__main__":
     window.plot(data)
 
     MainWindow.show()
+
+    dataloader.update(HEADERS, [randint(0, 300) for n in range(0, len(HEADERS))])
+
+    
+
     sys.exit(app.exec_())
