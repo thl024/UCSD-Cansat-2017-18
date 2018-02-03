@@ -1,52 +1,41 @@
-# XBee Stuffs
-def update():
-	pass
-
 class XBeeCommunicator():
 
-	def __init__(self):
-		pass
+    def __init__(self):
+        self.connected = False
+        pass
 
-	def connect():
-		while (True):
-	        self.port, choice = self.ui.inputdialog("Port", "Input Port (/dev/tty or COM)")
-	        try:
-	            test = serial.Serial(port=self.port)
-	            test.close()
-	            self.PortSet = True
-	            print(self.PortSet)
-	            break
-	        except:
-	            if (not choice):
-	                self.PortSet = False
-	                return
-	            else:
-	                self.ui.warningdialog("Not a valid port, try again.")
-	                self.PortSet = False
+    def connect(self, port):
+        try:
+            # test = serial.Serial(port=self.port)
+            # test.close()
+            self.connected = True
+            print("Connected to XBee.")
+            return True
+        except:
+            return False
 
-	def start():
-		serialStateQ.put("Start Serial")
-        processstart(self.serialcomms, (self.port,), False)
-        print("starting serial...")
+    def start(self):
+        if not self.connected:
+           return False
 
-    def pause():
-    	serialStateQ.put("Stop Serial")
+        ## serialStateQ.put("Start Serial")
+        # processstart(self.serialcomms, (self.port,), False)
+        print("Starting XBee Connection")
+        return True
 
-    def end():
-    	serialStateQ.put("End Serial")
+    def pause(self):
+        if not self.connected:
+           return False
 
+        # serialStateQ.put("Pausing XBee Connection")
+        print("Pausing XBee Connection")
+        return True
 
-# Connect
-def serialmenuconnect(self, case):
-        print(case)
-        if case == 1:
-            
-        elif case == 2 and self.PortSet:
-            
-        elif case == 3 and self.PortSet:
-            
-        elif case == 4 and self.PortSet:
-            
-        else:
-            self.ui.warningdialog("Need to enter valid port!")
+    def stop(self):
+        if not self.connected:
+            return False
+
+        # serialStateQ.put("Stopping XBeeConnection")
+        print("Stopping XBee Connection")
+        return True
 
