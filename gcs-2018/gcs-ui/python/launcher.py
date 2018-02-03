@@ -20,6 +20,7 @@ class WindowWrapper():
     def __init__(self, ui):
         self.ui = ui
 
+
     def codeUpdatesToUI(self):
         self.ui.figure = Figure()
         self.ui.canvas = FigureCanvas(ui.figure)
@@ -38,6 +39,9 @@ class WindowWrapper():
             x = "Time", y = "Altitude")
 
 
+    def setUpHandlers(self):
+        pass
+
 # Instantiate UI
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
@@ -55,10 +59,10 @@ if __name__ == "__main__":
     data = dataloader.fetch(["Time", "Altitude"])
     window.plot(data)
 
+    # Show window
     MainWindow.show()
 
+    # Test update
     dataloader.update(HEADERS, [randint(0, 300) for n in range(0, len(HEADERS))])
-
-    
 
     sys.exit(app.exec_())
