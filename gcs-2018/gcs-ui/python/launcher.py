@@ -19,6 +19,7 @@ class WindowWrapper():
 
     def __init__(self, ui):
         self.ui = ui
+        self.ax = None
 
     def codeUpdatesToUI(self):
         self.ui.figure = Figure()
@@ -32,10 +33,16 @@ class WindowWrapper():
     need ax = self.ui.figure.add_subplot(111) to show the graph
     set x axis to Time and y axis to altitude
     """
-    def plot(self, data):
-        x = data.ix[:,0]
-        ax = self.ui.figure.add_subplot(111);
-        ax.plot(data["Time"].astype(float), data["Altitude"].astype(float))
+    def plot(self, data, x, y):
+        self.ax = self.ui.figure.add_subplot(111)
+        self.ax.plot(data[x].astype(float), data[y].astype(float),
+            color = "xkcd:teal")
+
+    # plots new points 
+    def plot_points(self, data, x, y):
+        self.ax.plot(data[x].tail(2).astype(float), 
+            data[y].tail(2).astype(float), color = "xkcd:teal")
+        self.ui.canvas.draw()
 
 
 # Instantiate UI
@@ -53,12 +60,15 @@ if __name__ == "__main__":
     dataloader = DataLoader("./Data.txt")
     dataloader.read_file()
     data = dataloader.fetch(["Time", "Altitude"])
-    window.plot(data)
+    window.plot(data, "Time", "Altitude")
 
     MainWindow.show()
 
+    print(data["Time"].tail(2), "\n", data["Altitude"].tail(2), "\n")
     dataloader.update(HEADERS, [randint(0, 300) for n in range(0, len(HEADERS))])
 
-    
+    data = dataloader.fetch(["Time", "Altitude"])
+    print(data["Time"].tail(2), "\n", data["Altitude"].tail(2))
+    window.plot_points(data, "Time", "Altitude")
 
     sys.exit(app.exec_())
