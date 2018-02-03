@@ -34,8 +34,8 @@ class WindowWrapper():
     """
     def plot(self, data):
         x = data.ix[:,0]
-        data.astype(float).plot(ax = self.ui.figure.add_subplot(111),
-            x = "Time", y = "Altitude")
+        ax = self.ui.figure.add_subplot(111);
+        ax.plot(data["Time"].astype(float), data["Altitude"].astype(float))
 
 
 # Instantiate UI
