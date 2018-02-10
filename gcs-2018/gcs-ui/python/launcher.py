@@ -49,6 +49,21 @@ class Wrapper():
             data[y].tail(2).astype(float), color = "xkcd:teal")
         self.ui.canvas.draw()
 
+    # Clear the plot
+    def plotClear(self):
+        self.ax.clear()
+        self.ui.canvas.draw()
+
+    # Update values below graph
+    # dataType is Velocity, Altitude, Temp, etc
+    # Pass in "all" to update all data types
+    def updateValues(self, data, dataType):
+        self.ui.label_11.setText(str(dataType))
+        # self.ui.label_11 is Time
+        # self.ui.label_9 is Altitude
+        # self.ui.label_6 is Velocity
+        # self.ui.label_5 is Wind Speed
+        # self.ui.label_4 is Pressure
 
     def setUpHandlers(self):
         self.ui.actionConnect.triggered.connect(self.selectPort)
@@ -122,11 +137,19 @@ if __name__ == "__main__":
     MainWindow.show()
 
     # Testing adding additional data points
-    print(data["Time"].tail(2), "\n", data["Altitude"].tail(2), "\n")
+    # print(data["Time"].tail(2), "\n", data["Altitude"].tail(2), "\n")
     dataloader.update(HEADERS, [randint(0, 300) for n in range(0, len(HEADERS))])
 
     data = dataloader.fetch(["Time", "Altitude"])
-    print(data["Time"].tail(2), "\n", data["Altitude"].tail(2))
+    # print(data["Time"].tail(2), "\n", data["Altitude"].tail(2))
     window.plot_points(data, "Time", "Altitude")
+    
+    # Clear the plot
+    # window.plotClear()
+
+    # Create timer to change display of text
+    timer = QtCore.QTimer()
+    timer.timeout.connect(lambda: window.updateValues(data, randint(0, 10)))
+    timer.start(1000)
 
     sys.exit(app.exec_())
