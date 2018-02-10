@@ -2,6 +2,7 @@ import sys
 
 from mainwindow import Ui_MainWindow
 from dataloader import DataLoader
+from xbee import XBeeCommunicator
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import matplotlib.pyplot as plt
@@ -15,11 +16,15 @@ HEADERS = ["TeamID", "Time", "Packet", "Altitude", "Pressure", "Airspeed", "Temp
 "GPSAlt", "Satellites", "GPSSpeed", "Heading", "ImageCount", "State"]
 
 
-class WindowWrapper():
+class Wrapper():
 
-    def __init__(self, ui):
+    def __init__(self, ui, xbee_communicator, dataloader=None):
         self.ui = ui
         self.ax = None
+        self.xbee_communicator = xbee_communicator
+        if not dataloader:
+            # Create default dataloader? Dataloader should be initialized with directory/file name
+            pass
 
     def codeUpdatesToUI(self):
         self.ui.figure = Figure()
@@ -45,25 +50,78 @@ class WindowWrapper():
         self.ui.canvas.draw()
 
 
+    def setUpHandlers(self):
+        self.ui.actionConnect.triggered.connect(self.selectPort)
+        self.ui.actionStart.triggered.connect(self.xbee_start)
+        self.ui.actionPause.triggered.connect(xbee_communicator.pause)
+        self.ui.actionStop.triggered.connect(xbee_communicator.stop)
+
+    def selectPort(self):
+        valid = False
+        while not valid:
+            port, choice = self.inputdialog("Port", "Input Port (/dev/tty or COM)")
+            if not choice:
+                print("None selected")
+                return
+            else:
+                print("Chosen port: {}".format(port))
+                valid = xbee_communicator.connect(port)
+                if not valid:
+                    self.warningdialog("Not a valid port, try again.")
+
+    def xbee_start(self):
+        valid = xbee_communicator.start()
+        if not valid:
+            self.warningdialog("No connection; cannot start.")
+
+    def xbee_pause(self):
+        valid = xbee_communicator.start()
+        if not valid:
+            self.warningdialog("No connection; cannot pause.")
+
+    def xbee_stop(self):
+        valid = xbee_communicator.start()
+        if not valid:
+            self.warningdialog("No connection; cannot stop.")
+
+    def inputdialog(self, title, message):
+        return QtWidgets.QInputDialog.getText(self.ui.mainwindow, title, message)
+
+    def warningdialog(self, message):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Warning)
+        msg.setText(message)
+        msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        msg.setWindowTitle("WARNING!")
+        ret = msg.exec_()
+
 # Instantiate UI
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    ui.mainwindow = MainWindow
+
+    # Setup necessary components
+    # Optional
+    dataloader = DataLoader("./Data.txt")
+    xbee_communicator = XBeeCommunicator()
 
     # Create wrapper around UI Window
-    window = WindowWrapper(ui)
+    window = Wrapper(ui, xbee_communicator, dataloader)
     window.codeUpdatesToUI()
+    window.setUpHandlers()
 
     # Create dataloader
-    dataloader = DataLoader("./Data.txt")
     dataloader.read_file()
     data = dataloader.fetch(["Time", "Altitude"])
     window.plot(data, "Time", "Altitude")
 
+    # Show window
     MainWindow.show()
 
+    # Testing adding additional data points
     print(data["Time"].tail(2), "\n", data["Altitude"].tail(2), "\n")
     dataloader.update(HEADERS, [randint(0, 300) for n in range(0, len(HEADERS))])
 
