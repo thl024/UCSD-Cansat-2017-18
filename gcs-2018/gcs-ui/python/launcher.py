@@ -11,6 +11,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 
 from random import randint
+from datetime import datetime
 
 HEADERS = ["TeamID", "Time", "Packet", "Altitude", "Pressure", "Airspeed", "Temperature", "Voltage", "Latitude", "Longitude",
 "GPSAlt", "Satellites", "GPSSpeed", "Heading", "ImageCount", "State"]
@@ -22,8 +23,9 @@ class Wrapper():
         self.ui = ui
         self.ax = None
         self.xbee_communicator = xbee_communicator
-        if not dataloader:
+        if dataloader:
             # Create default dataloader? Dataloader should be initialized with directory/file name
+            self.dataloader = dataloader
             pass
 
     def codeUpdatesToUI(self):
@@ -49,14 +51,53 @@ class Wrapper():
             data[y].tail(2).astype(float), color = "xkcd:teal")
         self.ui.canvas.draw()
 
-
+    # Connects buttons to given functions
     def setUpHandlers(self):
-        self.ui.actionConnect.triggered.connect(self.selectPort)
+        self.ui.actionConnect.triggered.connect(self.select_port)
         self.ui.actionStart.triggered.connect(self.xbee_start)
-        self.ui.actionPause.triggered.connect(xbee_communicator.pause)
-        self.ui.actionStop.triggered.connect(xbee_communicator.stop)
+        self.ui.actionPause.triggered.connect(self.xbee_pause)
+        self.ui.actionStop.triggered.connect(self.xbee_stop)
 
-    def selectPort(self):
+        self.ui.actionNew_Session.triggered.connect(self.new_session)
+        self.ui.actionLoad_Session.triggered.connect(self.load_session)
+
+    # Starts a new session (new data file)
+    def new_session(self):
+        if self.yesno_prompt("New Session", "Are you sure you want to start a new session?"):
+            if self.dataloader is not None:
+                self.dataloader.save_as_csv()
+
+            # Use current time as filename
+            self.dataloader = DataLoader("data/" + str(datetime.now()) + ".csv")
+            self.dataloader.save_as_csv()
+
+            # Clear old plot and plot new data (which is nothing)
+            data = self.dataloader.fetch(["Time", "Altitude"])
+            window.plot(data, "Time", "Altitude")
+
+    # Loads a session from an old csv file
+    def load_session(self):
+        if self.yesno_prompt("Load Session", "Are you sure you want to load a session?"):
+
+            # Prompt user to choose filename
+            chosen = self.openFileNameDialog()
+            if chosen == '':
+                return
+
+            # Save current data loader
+            if self.dataloader is not None:
+                self.dataloader.save_as_csv()
+            
+            # Load data from file
+            self.dataloader = DataLoader(chosen)
+            self.dataloader.read_file()
+
+            # Plot again - ideally migrate to an update UI function
+            data = self.dataloader.fetch(["Time", "Altitude"])
+            window.plot(data, "Time", "Altitude")
+
+
+    def select_port(self):
         valid = False
         while not valid:
             port, choice = self.inputdialog("Port", "Input Port (/dev/tty or COM)")
@@ -72,17 +113,17 @@ class Wrapper():
     def xbee_start(self):
         valid = xbee_communicator.start()
         if not valid:
-            self.warningdialog("No connection; cannot start.")
+            self.warningdialog("Not connected; cannot start.")
 
     def xbee_pause(self):
         valid = xbee_communicator.start()
         if not valid:
-            self.warningdialog("No connection; cannot pause.")
+            self.warningdialog("Not connected; cannot pause.")
 
     def xbee_stop(self):
         valid = xbee_communicator.start()
         if not valid:
-            self.warningdialog("No connection; cannot stop.")
+            self.warningdialog("Not connected; cannot stop.")
 
     def inputdialog(self, title, message):
         return QtWidgets.QInputDialog.getText(self.ui.mainwindow, title, message)
@@ -95,6 +136,21 @@ class Wrapper():
         msg.setWindowTitle("WARNING!")
         ret = msg.exec_()
 
+    def yesno_prompt(self, title, msg):
+        reply = QtWidgets.QMessageBox.question(self.ui.mainwindow, title, 
+                 msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.Yes:
+            return True
+        else:
+            return False   
+
+    def openFileNameDialog(self):    
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self.ui.mainwindow,"QFileDialog.getOpenFileName()", 
+            "","All Files (*);;Python Files (*.py)", options=options)
+        return fileName
+
 # Instantiate UI
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
@@ -105,7 +161,7 @@ if __name__ == "__main__":
 
     # Setup necessary components
     # Optional
-    dataloader = DataLoader("./Data.txt")
+    dataloader = DataLoader("./data/Data.txt")
     xbee_communicator = XBeeCommunicator()
 
     # Create wrapper around UI Window
