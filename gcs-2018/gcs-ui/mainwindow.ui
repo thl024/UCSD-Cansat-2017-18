@@ -408,9 +408,6 @@
       </layout>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QGraphicsView" name="graphicsView"/>
-    </item>
     <item row="1" column="0">
      <widget class="QWidget" name="widget_4" native="true">
       <property name="maximumSize">
@@ -647,6 +644,56 @@
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QGraphicsView" name="graphicsView"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QWidget" name="widget_7" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="maximumSize">
+          <size>
+           <width>70</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Current Session:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="session_label">
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Placeholder</string>
+         </property>
         </widget>
        </item>
       </layout>
