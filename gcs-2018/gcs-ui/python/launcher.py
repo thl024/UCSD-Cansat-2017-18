@@ -33,6 +33,8 @@ class Wrapper():
         self.ui.canvas = FigureCanvas(ui.figure)
         self.ui.canvas.setObjectName("gridCanvas")
         self.ui.gridLayout.addWidget(ui.canvas, 0, 0, 1, 1)
+        if self.dataloader is not None:
+            self.update_session_name(self.dataloader.file_name)
 
     # plot the data
     """
@@ -85,8 +87,9 @@ class Wrapper():
                 self.dataloader.save_as_csv()
 
             # Use current time as filename
-            self.dataloader = DataLoader("data/" + str(datetime.now()) + ".csv")
+            self.dataloader = DataLoader("./data/" + str(datetime.now()) + ".csv")
             self.dataloader.save_as_csv()
+            self.update_session_name(self.dataloader.file_name)
 
             # Clear old plot and plot new data (which is nothing)
             self.plotClear()
@@ -109,6 +112,7 @@ class Wrapper():
             # Load data from file
             self.dataloader = DataLoader(chosen)
             self.dataloader.read_file()
+            self.update_session_name(self.dataloader.file_name)
 
             # Plot again - ideally migrate to an update UI function
             self.plotClear()
@@ -169,6 +173,9 @@ class Wrapper():
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self.ui.mainwindow,"QFileDialog.getOpenFileName()", 
             "","All Files (*);;Python Files (*.py)", options=options)
         return fileName
+
+    def update_session_name(self, name):
+        self.ui.session_label.setText(name)
 
 # Instantiate UI
 if __name__ == "__main__":
