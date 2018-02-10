@@ -44,12 +44,29 @@ class Wrapper():
         self.ax = self.ui.figure.add_subplot(111)
         self.ax.plot(data[x].astype(float), data[y].astype(float),
             color = "xkcd:teal")
+        self.ui.canvas.draw()
 
     # plots new points 
     def plot_points(self, data, x, y):
         self.ax.plot(data[x].tail(2).astype(float), 
             data[y].tail(2).astype(float), color = "xkcd:teal")
         self.ui.canvas.draw()
+
+    # Clear the plot
+    def plotClear(self):
+        self.ax.clear()
+        self.ui.canvas.draw()
+
+    # Update values below graph
+    # dataType is Velocity, Altitude, Temp, etc
+    # Pass in "all" to update all data types
+    def updateValues(self, data, dataType):
+        self.ui.label_11.setText(str(dataType))
+        # self.ui.label_11 is Time
+        # self.ui.label_9 is Altitude
+        # self.ui.label_6 is Velocity
+        # self.ui.label_5 is Wind Speed
+        # self.ui.label_4 is Pressure
 
     # Connects buttons to given functions
     def setUpHandlers(self):
@@ -72,6 +89,7 @@ class Wrapper():
             self.dataloader.save_as_csv()
 
             # Clear old plot and plot new data (which is nothing)
+            self.plotClear()
             data = self.dataloader.fetch(["Time", "Altitude"])
             window.plot(data, "Time", "Altitude")
 
@@ -93,6 +111,7 @@ class Wrapper():
             self.dataloader.read_file()
 
             # Plot again - ideally migrate to an update UI function
+            self.plotClear()
             data = self.dataloader.fetch(["Time", "Altitude"])
             window.plot(data, "Time", "Altitude")
 
@@ -178,11 +197,16 @@ if __name__ == "__main__":
     MainWindow.show()
 
     # Testing adding additional data points
-    print(data["Time"].tail(2), "\n", data["Altitude"].tail(2), "\n")
+    # print(data["Time"].tail(2), "\n", data["Altitude"].tail(2), "\n")
     dataloader.update(HEADERS, [randint(0, 300) for n in range(0, len(HEADERS))])
 
     data = dataloader.fetch(["Time", "Altitude"])
-    print(data["Time"].tail(2), "\n", data["Altitude"].tail(2))
+    # print(data["Time"].tail(2), "\n", data["Altitude"].tail(2))
     window.plot_points(data, "Time", "Altitude")
+
+    # Create timer to change display of text
+    timer = QtCore.QTimer()
+    timer.timeout.connect(lambda: window.updateValues(data, randint(0, 10)))
+    timer.start(1000)
 
     sys.exit(app.exec_())
