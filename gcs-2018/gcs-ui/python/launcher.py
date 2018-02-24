@@ -119,6 +119,8 @@ class Wrapper():
             data = self.dataloader.fetch(["Time", "Altitude"])
             window.plot(data, "Time", "Altitude")
 
+    def xbee_update(self):
+        pass
 
     def select_port(self):
         valid = False
@@ -134,17 +136,17 @@ class Wrapper():
                     self.warningdialog("Not a valid port, try again.")
 
     def xbee_start(self):
-        valid = xbee_communicator.start()
+        valid = xbee_communicator.start(self.xbee_update)
         if not valid:
             self.warningdialog("Not connected; cannot start.")
 
     def xbee_pause(self):
-        valid = xbee_communicator.start()
+        valid = xbee_communicator.pause()
         if not valid:
             self.warningdialog("Not connected; cannot pause.")
 
     def xbee_stop(self):
-        valid = xbee_communicator.start()
+        valid = xbee_communicator.stop()
         if not valid:
             self.warningdialog("Not connected; cannot stop.")
 
