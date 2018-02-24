@@ -28,7 +28,7 @@ class Wrapper():
 
         # populate plot select menu
         self.ui.comboBox.clear()
-        self.ui.comboBox.addItem("All")
+        # self.ui.comboBox.addItem("All")
         # should create separate array of items we want to plot
         self.ui.comboBox.addItems(HEADERS)
 
