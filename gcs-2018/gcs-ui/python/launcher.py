@@ -13,6 +13,8 @@ from matplotlib.figure import Figure
 from random import randint
 from datetime import datetime
 
+import warnings
+
 HEADERS = ["TeamID", "Time", "Packet", "Altitude", "Pressure", "Airspeed", "Temperature", "Voltage", "Latitude", "Longitude",
 "GPSAlt", "Satellites", "GPSSpeed", "Heading", "ImageCount", "State"]
 
@@ -23,6 +25,16 @@ class Wrapper():
         self.ui = ui
         self.ax = None
         self.xbee_communicator = xbee_communicator
+
+        # populate plot select menu
+        self.ui.comboBox.clear()
+        self.ui.comboBox.addItem("All")
+        # should create separate array of items we want to plot
+        self.ui.comboBox.addItems(HEADERS)
+
+        # store the current option select in plot select
+        self.currentPlot = self.ui.comboBox.currentText()
+
         if dataloader:
             # Create default dataloader? Dataloader should be initialized with directory/file name
             self.dataloader = dataloader
@@ -76,6 +88,8 @@ class Wrapper():
         self.ui.actionStart.triggered.connect(self.xbee_start)
         self.ui.actionPause.triggered.connect(self.xbee_pause)
         self.ui.actionStop.triggered.connect(self.xbee_stop)
+		
+        self.ui.comboBox.activated.connect(self.setComboBox)
 
         self.ui.actionNew_Session.triggered.connect(self.new_session)
         self.ui.actionLoad_Session.triggered.connect(self.load_session)
@@ -150,6 +164,21 @@ class Wrapper():
 
     def inputdialog(self, title, message):
         return QtWidgets.QInputDialog.getText(self.ui.mainwindow, title, message)
+		
+    # update the current plot and replace the previous plot
+    def setComboBox(self, index):
+        self.currentPlot = self.ui.comboBox.itemText(index)
+        
+        if (self.currentPlot == "All"):
+            pass
+        else:
+            data = self.dataloader.fetch(["Time", self.currentPlot])
+            warnings.filterwarnings("ignore",module="matplotlib")
+            self.plotClear()
+            self.plot(data, "Time", self.currentPlot)
+        
+    def getCurrentPlot(self):
+        return self.currentPlot
 
     def warningdialog(self, message):
         msg = QtWidgets.QMessageBox()
