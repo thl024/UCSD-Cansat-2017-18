@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow.ui'
+# Form implementation generated from reading ui file '../mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.9
 #
@@ -96,6 +96,8 @@ class Ui_MainWindow(object):
         self.textEdit_3.setFont(font)
         self.textEdit_3.setFrameShape(QtWidgets.QFrame.WinPanel)
         self.textEdit_3.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.textEdit_3.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit_3.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.textEdit_3.setObjectName("textEdit_3")
         self.horizontalLayout.addWidget(self.textEdit_3)
         self.gridLayout_3.addWidget(self.widget_2, 1, 1, 1, 1)
@@ -126,6 +128,8 @@ class Ui_MainWindow(object):
         font.setWeight(50)
         self.textEdit_4.setFont(font)
         self.textEdit_4.setFrameShape(QtWidgets.QFrame.WinPanel)
+        self.textEdit_4.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.textEdit_4.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.textEdit_4.setObjectName("textEdit_4")
         self.horizontalLayout_4.addWidget(self.textEdit_4)
         self.gridLayout_3.addWidget(self.widget_3, 2, 1, 1, 1)
@@ -206,6 +210,7 @@ class Ui_MainWindow(object):
         self.widget_6.setObjectName("widget_6")
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.widget_6)
         self.horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_7.setSpacing(6)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.label_12 = QtWidgets.QLabel(self.widget_6)
         font = QtGui.QFont()
@@ -328,7 +333,7 @@ class Ui_MainWindow(object):
         self.statusBar.setObjectName("statusBar")
         MainWindow.setStatusBar(self.statusBar)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1062, 22))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1062, 21))
         self.menuBar.setObjectName("menuBar")
         self.menuFile = QtWidgets.QMenu(self.menuBar)
         self.menuFile.setObjectName("menuFile")
