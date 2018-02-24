@@ -100,26 +100,33 @@ class Wrapper():
     # Starts a new session (new data file)
     def new_session(self):
         if self.yesno_prompt("New Session", "Are you sure you want to start a new session?"):
+
+            # Prompt user to choose filename
+            fn = self.saveFileNameDialog()
+            if fn == '':
+                return
+
+            # Save current data
             if self.dataloader is not None:
                 self.dataloader.save_as_csv()
 
             # Use current time as filename
-            self.dataloader = DataLoader("./data/" + str(datetime.now()) + ".csv")
+            self.dataloader = DataLoader(fn)
             self.dataloader.save_as_csv()
             self.update_session_name(self.dataloader.file_name)
 
             # Clear old plot and plot new data (which is nothing)
             self.plotClear()
-            data = self.dataloader.fetch(["Time", "Altitude"])
-            window.plot(data, "Time", "Altitude")
+            data = self.dataloader.fetch(["Time", self.currentPlot])
+            window.plot(data, "Time", self.currentPlot)
 
     # Loads a session from an old csv file
     def load_session(self):
         if self.yesno_prompt("Load Session", "Are you sure you want to load a session?"):
 
             # Prompt user to choose filename
-            chosen = self.openFileNameDialog()
-            if chosen == '':
+            fn = self.openFileNameDialog()
+            if fn == '':
                 return
 
             # Save current data loader
@@ -127,14 +134,14 @@ class Wrapper():
                 self.dataloader.save_as_csv()
             
             # Load data from file
-            self.dataloader = DataLoader(chosen)
+            self.dataloader = DataLoader(fn)
             self.dataloader.read_file()
             self.update_session_name(self.dataloader.file_name)
 
             # Plot again - ideally migrate to an update UI function
             self.plotClear()
-            data = self.dataloader.fetch(["Time", "Altitude"])
-            window.plot(data, "Time", "Altitude")
+            data = self.dataloader.fetch(["Time", self.currentPlot])
+            window.plot(data, "Time", self.currentPlot)
 
     def xbee_update(self, data_row):
         if self.dataloader is None:
@@ -214,6 +221,13 @@ class Wrapper():
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self.ui.mainwindow,"QFileDialog.getOpenFileName()", 
+            "","All Files (*);;Python Files (*.py)", options=options)
+        return fileName
+
+    def saveFileNameDialog(self):
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self.ui.mainwindow,"QFileDialog.getSaveFileName()", 
             "","All Files (*);;Python Files (*.py)", options=options)
         return fileName
 
