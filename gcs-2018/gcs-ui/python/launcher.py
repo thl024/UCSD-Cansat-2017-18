@@ -58,6 +58,9 @@ class Wrapper():
         self.ax = self.ui.figure.add_subplot(111)
         self.ax.plot(data[x].astype(float), data[y].astype(float),
             color = "xkcd:teal")
+        self.ax.set_title("{} vs {}".format(x, y))
+        self.ax.set_xlabel(x)
+        self.ax.set_ylabel(y)
         self.ui.canvas.draw()
 
     # plots new points 
@@ -133,8 +136,17 @@ class Wrapper():
             data = self.dataloader.fetch(["Time", "Altitude"])
             window.plot(data, "Time", "Altitude")
 
-    def xbee_update(self):
-        pass
+    def xbee_update(self, data_row):
+        if self.dataloader is None:
+            print("Error: Session has not been started")
+            return
+        self.dataloader.update(HEADERS, data_row)
+
+        x = "Time"
+        y = self.currentPlot
+
+        data = self.dataloader.fetch([x, y])
+        self.plot_points(data, x, y)
 
     def select_port(self):
         valid = False

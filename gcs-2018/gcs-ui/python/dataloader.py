@@ -28,6 +28,7 @@ class DataLoader():
         self.data.loc[len(self.data)] = new_data
         timeCount = self.data.iloc[len(self.data) - 2]["Time"]
         self.data.iloc[len(self.data) - 1]["Time"] = int(timeCount) + 1
+        self.save_as_csv()
 
     # access data by passing in column names
     def fetch(self, columns):

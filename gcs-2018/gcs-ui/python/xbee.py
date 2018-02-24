@@ -1,6 +1,7 @@
 import serial
 import time
 from threading import Thread
+from random import randint
 
 class XBeeCommunicator():
 
@@ -64,8 +65,8 @@ class XBeeCommunicator():
             #     s = ser.read(10)        # read up to ten bytes (timeout)
             #     line = ser.readline()   # read a '\n' terminated line
 
-            # threaded_function()
+            randdata = [randint(0, 300) for n in range(0, 16)]
+            threaded_function(randdata)
+            time.sleep(3)
 
-            print("Thread run")
-            time.sleep(1)
             pass
