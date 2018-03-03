@@ -92,6 +92,7 @@ class Wrapper():
         self.ax.set_title("{} vs {}".format(x, y))
         self.ax.set_xlabel(x)
         self.ax.set_ylabel(y)
+        self.ax.grid()
         
         yLim = self.ui.figure.gca().get_ylim()
         if (yLim[0] < self.yLimits[0]):
@@ -170,7 +171,7 @@ class Wrapper():
                 self.dataloader.save_as_csv()
 
             # Use current time as filename
-            self.dataloader = DataLoader(fn)
+            self.dataloader = DataLoader(fn, HEADERS)
             self.dataloader.save_as_csv()
 
             self.initNewUI()
@@ -189,7 +190,7 @@ class Wrapper():
                 self.dataloader.save_as_csv()
             
             # Load data from file
-            self.dataloader = DataLoader(fn)
+            self.dataloader = DataLoader(fn, HEADERS)
             self.dataloader.read_file()
             
             self.initNewUI()
@@ -327,7 +328,7 @@ if __name__ == "__main__":
 
     # Setup necessary components
     # Optional
-    dataloader = DataLoader("./data/Data.txt")
+    dataloader = DataLoader("./data/Data.txt", HEADERS)
     dataloader.read_file()
 
     xbee_communicator = XBeeCommunicator()

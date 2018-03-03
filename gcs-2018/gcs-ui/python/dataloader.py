@@ -1,15 +1,13 @@
 import pandas as pd
 
-HEADERS = ["TeamID", "Time", "Packet", "Altitude", "Pressure", "Airspeed", "Temperature", "Voltage", "Latitude", "Longitude",
-"GPSAlt", "Satellites", "GPSSpeed", "Heading", "ImageCount", "State"]
-
 # loads in data from the passed in filename
 class DataLoader():
 
     # define variables to store data
-    def __init__(self, file_name):
+    def __init__(self, file_name, headers):
         self.file_name = file_name
-        self.data = pd.DataFrame(columns=HEADERS)
+        self.headers = headers
+        self.data = pd.DataFrame(columns=self.headers)
 
     # read lines from the file passed in
     def read_file(self):
@@ -39,4 +37,4 @@ class DataLoader():
 
     # Save current dataframe to CSV file
     def save_as_csv(self):
-        self.data.to_csv(self.file_name, columns=HEADERS, index=False)
+        self.data.to_csv(self.file_name, columns=self.headers, index=False)
