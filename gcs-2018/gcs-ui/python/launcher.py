@@ -4,6 +4,8 @@ from mainwindow import Ui_MainWindow
 from dataloader import DataLoader
 from xbee import XBeeCommunicator
 
+from functools import partial
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -28,10 +30,13 @@ class Wrapper():
 
         # hold the smallest min and largest max limits for the y axis
         self.yLimits = [0, 0]
+        self.xLimits = [0, 0]
 
         # hold the current min and max limits for the y axis
         self.minY = 0
         self.maxY = 0
+        self.minX = 0
+        self.maxX = 0
 
         # populate plot select menu
         self.ui.comboBox.clear()
@@ -40,6 +45,7 @@ class Wrapper():
         self.ui.comboBox.addItems(HEADERS)
 
         self.ui.horizontalSlider_2.setValue(100)
+        self.ui.horizontalSlider_4.setValue(100)
 
         # store the current option select in plot select
         self.currentPlot = self.ui.comboBox.currentText()
@@ -75,6 +81,25 @@ class Wrapper():
             # Update session name
             self.update_session_name("No File Loaded")
 
+    def setYLimits(self):
+        yLim = self.ui.figure.gca().get_ylim()
+        if (yLim[0] < self.yLimits[0]):
+            self.yLimits[0] = yLim[0]
+        if (yLim[1] > self.yLimits[1]):
+            self.yLimits[1] = yLim[1]
+
+        self.minY = self.yLimits[0]
+        self.maxY = self.yLimits[1]
+        
+    def setXLimits(self):
+        xLim = self.ui.figure.gca().get_xlim()
+        if (xLim[0] < self.xLimits[0]):
+            self.xLimits[0] = xLim[0]
+        if (xLim[1] > self.xLimits[1]):
+            self.xLimits[1] = xLim[1]
+
+        self.minX = self.xLimits[0]
+        self.maxX = self.xLimits[1]
 
     # plot the data
     """
@@ -90,14 +115,8 @@ class Wrapper():
         self.ax.set_xlabel(x)
         self.ax.set_ylabel(y)
         
-        yLim = self.ui.figure.gca().get_ylim()
-        if (yLim[0] < self.yLimits[0]):
-            self.yLimits[0] = yLim[0]
-        if (yLim[1] > self.yLimits[1]):
-            self.yLimits[1] = yLim[1]
-
-        self.minY = self.yLimits[0]
-        self.maxY = self.yLimits[1]
+        self.setXLimits()
+        self.setYLimits()
 
         self.ui.canvas.draw()
 
@@ -106,14 +125,8 @@ class Wrapper():
         self.ax.plot(data[x].tail(2).astype(float), 
             data[y].tail(2).astype(float), color = "xkcd:teal")
 
-        yLim = self.ui.figure.gca().get_ylim()
-        if (yLim[0] < self.yLimits[0]):
-            self.yLimits[0] = yLim[0]
-        if (yLim[1] > self.yLimits[1]):
-            self.yLimits[1] = yLim[1]
-
-        self.minY = self.yLimits[0]
-        self.maxY = self.yLimits[1]
+        self.setXLimits()
+        self.setYLimits()
 
         self.ui.canvas.draw()
 
@@ -143,9 +156,13 @@ class Wrapper():
         # detect when a new plot has been selected
         self.ui.comboBox.activated.connect(self.setComboBox)
 
-        # detect when min/max sliders have changed
-        self.ui.horizontalSlider_2.valueChanged.connect(self.maxSliderChange)
-        self.ui.horizontalSlider.valueChanged.connect(self.minSliderChange)
+        # detect when max sliders have changed
+        self.ui.horizontalSlider_2.valueChanged.connect(partial(self.maxSliderChange, self.ui.horizontalSlider_2)) # Y Max
+        self.ui.horizontalSlider_4.valueChanged.connect(partial(self.maxSliderChange, self.ui.horizontalSlider_4)) # X Max
+
+        # detect when min sliders have changed
+        self.ui.horizontalSlider.valueChanged.connect(partial(self.minSliderChange, self.ui.horizontalSlider)) # Y Min
+        self.ui.horizontalSlider_3.valueChanged.connect(partial(self.minSliderChange, self.ui.horizontalSlider_3)) # X Min
 
         self.ui.actionNew_Session.triggered.connect(self.new_session)
         self.ui.actionLoad_Session.triggered.connect(self.load_session)
@@ -244,25 +261,41 @@ class Wrapper():
             self.plot(data, "Time", self.currentPlot)
 
     # change the max range of the y axis using slider
-    def maxSliderChange(self):
-        newMaxValue = self.ui.horizontalSlider_2.value()
-        self.maxY = newMaxValue / 100.0 * self.yLimits[1]
+    def maxSliderChange(self, slider):
+        newMaxValue = slider.value()
         axes = self.ui.figure.gca()
-        axes.set_ylim([self.minY, self.maxY])
+        # slider for Y Max
+        if (slider == self.ui.horizontalSlider_2):
+            self.maxY = newMaxValue / 100.0 * self.yLimits[1]
+            axes.set_ylim([self.minY, self.maxY])
+            if (self.ui.horizontalSlider.value() > slider.value()):
+                slider.setValue(self.ui.horizontalSlider.value())
+        # slider for X Max
+        else:
+            self.maxX = newMaxValue / 100.0 * self.xLimits[1]
+            axes.set_xlim([self.minX, self.maxX])
+            if (self.ui.horizontalSlider_3.value() > slider.value()):
+                slider.setValue(self.ui.horizontalSlider_3.value())
         warnings.filterwarnings("ignore",module="matplotlib")
-        if (self.ui.horizontalSlider.value() > self.ui.horizontalSlider_2.value()):
-            self.ui.horizontalSlider_2.setValue(self.ui.horizontalSlider.value())
         self.ui.canvas.draw()
 
     # change the min range of the y axis using slider
-    def minSliderChange(self):
-        newMinValue = self.ui.horizontalSlider.value()
-        self.minY = newMinValue / 100.0 * self.yLimits[1]
+    def minSliderChange(self, slider):
+        newMinValue = slider.value()
         axes = self.ui.figure.gca()
-        axes.set_ylim([self.minY, self.maxY])
+        # Slider for Y Min
+        if (slider == self.ui.horizontalSlider):
+            self.minY = newMinValue / 100.0 * self.yLimits[1]
+            axes.set_ylim([self.minY, self.maxY])
+            if (self.ui.horizontalSlider_2.value() < slider.value()):
+                slider.setValue(self.ui.horizontalSlider_2.value())
+        # Slider for X Min
+        else:
+            self.minX = newMinValue / 100.0 * self.xLimits[1]
+            axes.set_xlim([self.minX, self.maxX])
+            if (self.ui.horizontalSlider_4.value() < slider.value()):
+                slider.setValue(self.ui.horizontalSlider_4.value())
         warnings.filterwarnings("ignore",module="matplotlib")
-        if (self.ui.horizontalSlider.value() > self.ui.horizontalSlider_2.value()):
-            self.ui.horizontalSlider.setValue(self.ui.horizontalSlider_2.value())
         self.ui.canvas.draw()
         
     def getCurrentPlot(self):
