@@ -56,6 +56,15 @@ class XBeeCommunicator():
         print("Stopping XBee Connection")
         return True
 
+    def snapshot(self):
+        if not self.connected:
+            return False
+
+        # Send signal
+
+        print("Snapshot Taken")
+        return True
+
     def receive_data_threaded(self, threaded_function):
 
         while (self.keep_threading):

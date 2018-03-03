@@ -77,6 +77,9 @@ class Wrapper():
             data = self.dataloader.fetch(["Time", self.currentPlot])
             window.plot(data, "Time", self.currentPlot)
 
+            # Update plot controls
+            self.update_plot_controls()
+
         else:
             # Update session name
             self.update_session_name("No File Loaded")
@@ -166,6 +169,9 @@ class Wrapper():
 
         self.ui.actionNew_Session.triggered.connect(self.new_session)
         self.ui.actionLoad_Session.triggered.connect(self.load_session)
+
+        # Snapshot detection
+        self.ui.pushButton.clicked.connect(self.snapshot)
 
     # Starts a new session (new data file)
     def new_session(self):
@@ -278,6 +284,7 @@ class Wrapper():
                 slider.setValue(self.ui.horizontalSlider_3.value())
         warnings.filterwarnings("ignore",module="matplotlib")
         self.ui.canvas.draw()
+        self.update_plot_controls()
 
     # change the min range of the y axis using slider
     def minSliderChange(self, slider):
@@ -297,9 +304,14 @@ class Wrapper():
                 slider.setValue(self.ui.horizontalSlider_4.value())
         warnings.filterwarnings("ignore",module="matplotlib")
         self.ui.canvas.draw()
+        self.update_plot_controls()
         
     def getCurrentPlot(self):
         return self.currentPlot
+
+    def snapshot(self):
+        if not self.xbee_communicator.snapshot():
+            self.warningdialog("Not connected to XBee")
 
     def warningdialog(self, message):
         msg = QtWidgets.QMessageBox()
@@ -334,8 +346,9 @@ class Wrapper():
     def update_session_name(self, name):
         self.ui.session_label.setText(name)
 
-    # def update_plot_controls(self, x, y):
-    #     self.ui.textEdit
+    def update_plot_controls(self):
+        self.ui.textEdit_3.setText(str(int(self.minY)))
+        self.ui.textEdit_4.setText(str(int(self.maxY)))
 
 # Instantiate UI
 if __name__ == "__main__":
