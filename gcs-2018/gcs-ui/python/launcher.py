@@ -71,6 +71,9 @@ class Wrapper():
             data = self.dataloader.fetch(["Time", self.currentPlot])
             window.plot(data, "Time", self.currentPlot)
 
+            # Update plot controls
+            self.update_plot_controls()
+
         else:
             # Update session name
             self.update_session_name("No File Loaded")
@@ -301,8 +304,9 @@ class Wrapper():
     def update_session_name(self, name):
         self.ui.session_label.setText(name)
 
-    # def update_plot_controls(self, x, y):
-    #     self.ui.textEdit
+    def update_plot_controls(self):
+        self.ui.textEdit_3.setText(self.minY)
+        self.ui.textEdit_4.setText(self.maxY)
 
 # Instantiate UI
 if __name__ == "__main__":
