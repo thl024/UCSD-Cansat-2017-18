@@ -45,8 +45,27 @@ class Wrapper():
         self.ui.canvas = FigureCanvas(ui.figure)
         self.ui.canvas.setObjectName("gridCanvas")
         self.ui.gridLayout.addWidget(ui.canvas, 0, 0, 1, 1)
+
+    def initNewUI(self):
+
+        # Change session name
         if self.dataloader is not None:
+
+            # Update session name
             self.update_session_name(self.dataloader.file_name)
+            
+            if self.ax is not None:
+                # Clear old plot to plot new data
+                self.plotClear()
+
+            # Plot initial data
+            data = self.dataloader.fetch(["Time", self.currentPlot])
+            window.plot(data, "Time", self.currentPlot)
+
+        else:
+            # Update session name
+            self.update_session_name("No File Loaded")
+
 
     # plot the data
     """
@@ -113,12 +132,8 @@ class Wrapper():
             # Use current time as filename
             self.dataloader = DataLoader(fn)
             self.dataloader.save_as_csv()
-            self.update_session_name(self.dataloader.file_name)
 
-            # Clear old plot and plot new data (which is nothing)
-            self.plotClear()
-            data = self.dataloader.fetch(["Time", self.currentPlot])
-            window.plot(data, "Time", self.currentPlot)
+            self.initNewUI()
 
     # Loads a session from an old csv file
     def load_session(self):
@@ -136,12 +151,8 @@ class Wrapper():
             # Load data from file
             self.dataloader = DataLoader(fn)
             self.dataloader.read_file()
-            self.update_session_name(self.dataloader.file_name)
-
-            # Plot again - ideally migrate to an update UI function
-            self.plotClear()
-            data = self.dataloader.fetch(["Time", self.currentPlot])
-            window.plot(data, "Time", self.currentPlot)
+            
+            self.initNewUI()
 
     def xbee_update(self, data_row):
         if self.dataloader is None:
@@ -245,32 +256,17 @@ if __name__ == "__main__":
     # Setup necessary components
     # Optional
     dataloader = DataLoader("./data/Data.txt")
+    dataloader.read_file()
+
     xbee_communicator = XBeeCommunicator()
 
     # Create wrapper around UI Window
     window = Wrapper(ui, xbee_communicator, dataloader)
     window.codeUpdatesToUI()
     window.setUpHandlers()
-
-    # Create dataloader
-    dataloader.read_file()
-    data = dataloader.fetch(["Time", "Altitude"])
-    window.plot(data, "Time", "Altitude")
+    window.initNewUI()
 
     # Show window
     MainWindow.show()
-
-    # Testing adding additional data points
-    # print(data["Time"].tail(2), "\n", data["Altitude"].tail(2), "\n")
-    dataloader.update(HEADERS, [randint(0, 300) for n in range(0, len(HEADERS))])
-
-    data = dataloader.fetch(["Time", "Altitude"])
-    # print(data["Time"].tail(2), "\n", data["Altitude"].tail(2))
-    window.plot_points(data, "Time", "Altitude")
-
-    # Create timer to change display of text
-    timer = QtCore.QTimer()
-    timer.timeout.connect(lambda: window.updateValues(data, randint(0, 10)))
-    timer.start(1000)
 
     sys.exit(app.exec_())
