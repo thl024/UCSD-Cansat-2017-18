@@ -245,6 +245,9 @@ class Wrapper():
     def update_session_name(self, name):
         self.ui.session_label.setText(name)
 
+    # def update_plot_controls(self, x, y):
+    #     self.ui.textEdit
+
 # Instantiate UI
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
