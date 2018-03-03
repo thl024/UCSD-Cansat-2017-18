@@ -39,7 +39,7 @@ class Wrapper():
         # should create separate array of items we want to plot
         self.ui.comboBox.addItems(HEADERS)
 
-        self.ui.horizontalSlider.setValue(100)
+        self.ui.horizontalSlider_2.setValue(100)
 
         # store the current option select in plot select
         self.currentPlot = self.ui.comboBox.currentText()
@@ -144,8 +144,8 @@ class Wrapper():
         self.ui.comboBox.activated.connect(self.setComboBox)
 
         # detect when min/max sliders have changed
-        self.ui.horizontalSlider.valueChanged.connect(self.maxSliderChange)
-        self.ui.horizontalSlider_2.valueChanged.connect(self.minSliderChange)
+        self.ui.horizontalSlider_2.valueChanged.connect(self.maxSliderChange)
+        self.ui.horizontalSlider.valueChanged.connect(self.minSliderChange)
 
         self.ui.actionNew_Session.triggered.connect(self.new_session)
         self.ui.actionLoad_Session.triggered.connect(self.load_session)
@@ -245,24 +245,24 @@ class Wrapper():
 
     # change the max range of the y axis using slider
     def maxSliderChange(self):
-        newMaxValue = self.ui.horizontalSlider.value()
+        newMaxValue = self.ui.horizontalSlider_2.value()
         self.maxY = newMaxValue / 100.0 * self.yLimits[1]
         axes = self.ui.figure.gca()
         axes.set_ylim([self.minY, self.maxY])
         warnings.filterwarnings("ignore",module="matplotlib")
-        if (self.ui.horizontalSlider_2.value() > self.ui.horizontalSlider.value()):
-            self.ui.horizontalSlider.setValue(self.ui.horizontalSlider_2.value())
+        if (self.ui.horizontalSlider.value() > self.ui.horizontalSlider_2.value()):
+            self.ui.horizontalSlider_2.setValue(self.ui.horizontalSlider.value())
         self.ui.canvas.draw()
 
     # change the min range of the y axis using slider
     def minSliderChange(self):
-        newMinValue = self.ui.horizontalSlider_2.value()
+        newMinValue = self.ui.horizontalSlider.value()
         self.minY = newMinValue / 100.0 * self.yLimits[1]
         axes = self.ui.figure.gca()
         axes.set_ylim([self.minY, self.maxY])
         warnings.filterwarnings("ignore",module="matplotlib")
-        if (self.ui.horizontalSlider_2.value() > self.ui.horizontalSlider.value()):
-            self.ui.horizontalSlider_2.setValue(self.ui.horizontalSlider.value())
+        if (self.ui.horizontalSlider.value() > self.ui.horizontalSlider_2.value()):
+            self.ui.horizontalSlider.setValue(self.ui.horizontalSlider_2.value())
         self.ui.canvas.draw()
         
     def getCurrentPlot(self):
