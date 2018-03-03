@@ -39,7 +39,7 @@ class Wrapper():
         # should create separate array of items we want to plot
         self.ui.comboBox.addItems(HEADERS)
 
-        self.ui.horizontalSlider.setValue(100)
+        self.ui.horizontalSlider_2.setValue(100)
 
         # store the current option select in plot select
         self.currentPlot = self.ui.comboBox.currentText()
@@ -147,11 +147,14 @@ class Wrapper():
         self.ui.comboBox.activated.connect(self.setComboBox)
 
         # detect when min/max sliders have changed
-        self.ui.horizontalSlider.valueChanged.connect(self.maxSliderChange)
-        self.ui.horizontalSlider_2.valueChanged.connect(self.minSliderChange)
+        self.ui.horizontalSlider_2.valueChanged.connect(self.maxSliderChange)
+        self.ui.horizontalSlider.valueChanged.connect(self.minSliderChange)
 
         self.ui.actionNew_Session.triggered.connect(self.new_session)
         self.ui.actionLoad_Session.triggered.connect(self.load_session)
+
+        # Snapshot detection
+        self.ui.pushButton.clicked.connect(self.snapshot)
 
     # Starts a new session (new data file)
     def new_session(self):
@@ -248,28 +251,34 @@ class Wrapper():
 
     # change the max range of the y axis using slider
     def maxSliderChange(self):
-        newMaxValue = self.ui.horizontalSlider.value()
+        newMaxValue = self.ui.horizontalSlider_2.value()
         self.maxY = newMaxValue / 100.0 * self.yLimits[1]
         axes = self.ui.figure.gca()
         axes.set_ylim([self.minY, self.maxY])
         warnings.filterwarnings("ignore",module="matplotlib")
-        if (self.ui.horizontalSlider_2.value() > self.ui.horizontalSlider.value()):
-            self.ui.horizontalSlider.setValue(self.ui.horizontalSlider_2.value())
+        if (self.ui.horizontalSlider.value() > self.ui.horizontalSlider_2.value()):
+            self.ui.horizontalSlider_2.setValue(self.ui.horizontalSlider.value())
         self.ui.canvas.draw()
+        self.update_plot_controls()
 
     # change the min range of the y axis using slider
     def minSliderChange(self):
-        newMinValue = self.ui.horizontalSlider_2.value()
+        newMinValue = self.ui.horizontalSlider.value()
         self.minY = newMinValue / 100.0 * self.yLimits[1]
         axes = self.ui.figure.gca()
         axes.set_ylim([self.minY, self.maxY])
         warnings.filterwarnings("ignore",module="matplotlib")
-        if (self.ui.horizontalSlider_2.value() > self.ui.horizontalSlider.value()):
-            self.ui.horizontalSlider_2.setValue(self.ui.horizontalSlider.value())
+        if (self.ui.horizontalSlider.value() > self.ui.horizontalSlider_2.value()):
+            self.ui.horizontalSlider.setValue(self.ui.horizontalSlider_2.value())
         self.ui.canvas.draw()
+        self.update_plot_controls()
         
     def getCurrentPlot(self):
         return self.currentPlot
+
+    def snapshot(self):
+        if not self.xbee_communicator.snapshot():
+            self.warningdialog("Not connected to XBee")
 
     def warningdialog(self, message):
         msg = QtWidgets.QMessageBox()
@@ -305,8 +314,8 @@ class Wrapper():
         self.ui.session_label.setText(name)
 
     def update_plot_controls(self):
-        self.ui.textEdit_3.setText(self.minY)
-        self.ui.textEdit_4.setText(self.maxY)
+        self.ui.textEdit_3.setText(str(int(self.minY)))
+        self.ui.textEdit_4.setText(str(int(self.maxY)))
 
 # Instantiate UI
 if __name__ == "__main__":
