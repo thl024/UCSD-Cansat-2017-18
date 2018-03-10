@@ -77,15 +77,20 @@ class Wrapper():
 
             # Plot initial data
             data = self.dataloader.fetch(["Time", self.currentPlot])
-            window.plot(data, "Time", self.currentPlot)
+            self.plot(data, "Time", self.currentPlot)
 
             # Update plot controls
             self.update_plot_controls()
+
+            # Update limits
+            self.updateLimits()
 
         else:
             # Update session name
             self.update_session_name("No File Loaded")
 
+
+            # TODO SET THE LIMITS OUTSIDE OF PLOT.. ONLY RELY ON THE DATA!
     def setYLimits(self):
         yLim = self.ui.figure.gca().get_ylim()
         if (yLim[0] < self.yLimits[0]):
@@ -119,6 +124,7 @@ class Wrapper():
         self.ax.set_title("{} vs {}".format(x, y))
         self.ax.set_xlabel(x)
         self.ax.set_ylabel(y)
+        self.ax.grid()
         
         self.setXLimits()
         self.setYLimits()
@@ -189,7 +195,7 @@ class Wrapper():
                 self.dataloader.save_as_csv()
 
             # Use current time as filename
-            self.dataloader = DataLoader(fn)
+            self.dataloader = DataLoader(fn, HEADERS)
             self.dataloader.save_as_csv()
 
             self.initNewUI()
@@ -208,7 +214,7 @@ class Wrapper():
                 self.dataloader.save_as_csv()
             
             # Load data from file
-            self.dataloader = DataLoader(fn)
+            self.dataloader = DataLoader(fn, HEADERS)
             self.dataloader.read_file()
             
             self.initNewUI()
@@ -267,31 +273,34 @@ class Wrapper():
             warnings.filterwarnings("ignore",module="matplotlib")
             self.plotClear()
             self.plot(data, "Time", self.currentPlot)
+            self.updateLimits()
+
+    def updateLimits(self):
+        axes = self.ui.figure.gca()
+        axes.set_xlim([self.minX, self.maxX])
+        axes.set_ylim([self.minY, self.maxY])
+        self.ui.canvas.draw()
 
     # change the max range of the y axis using slider
     def maxSliderChange(self, slider):
         newMaxValue = slider.value()
-        axes = self.ui.figure.gca()
         # slider for Y Max
         if (slider == self.ui.horizontalSlider_2):
             self.maxY = newMaxValue / 100.0 * self.yLimits[1]
-            axes.set_ylim([self.minY, self.maxY])
             if (self.ui.horizontalSlider.value() > slider.value()):
                 slider.setValue(self.ui.horizontalSlider.value())
         # slider for X Max
         else:
             self.maxX = newMaxValue / 100.0 * self.xLimits[1]
-            axes.set_xlim([self.minX, self.maxX])
             if (self.ui.horizontalSlider_3.value() > slider.value()):
                 slider.setValue(self.ui.horizontalSlider_3.value())
         warnings.filterwarnings("ignore",module="matplotlib")
-        self.ui.canvas.draw()
+        self.updateLimits()
         self.update_plot_controls()
 
     # change the min range of the y axis using slider
     def minSliderChange(self, slider):
         newMinValue = slider.value()
-        axes = self.ui.figure.gca()
         # Slider for Y Min
         if (slider == self.ui.horizontalSlider):
             self.minY = newMinValue / 100.0 * self.yLimits[1]
@@ -304,8 +313,8 @@ class Wrapper():
             axes.set_xlim([self.minX, self.maxX])
             if (self.ui.horizontalSlider_4.value() < slider.value()):
                 slider.setValue(self.ui.horizontalSlider_4.value())
+
         warnings.filterwarnings("ignore",module="matplotlib")
-        self.ui.canvas.draw()
         self.update_plot_controls()
         
     def getCurrentPlot(self):
@@ -362,7 +371,7 @@ if __name__ == "__main__":
 
     # Setup necessary components
     # Optional
-    dataloader = DataLoader("./data/Data.txt")
+    dataloader = DataLoader("./data/Data.txt", HEADERS)
     dataloader.read_file()
 
     xbee_communicator = XBeeCommunicator()
