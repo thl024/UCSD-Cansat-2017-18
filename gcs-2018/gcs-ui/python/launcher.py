@@ -29,10 +29,12 @@ class Wrapper():
         self.xbee_communicator = xbee_communicator
 
         # hold the smallest min and largest max limits for the y axis
+        # this lets us know the highest or lowest we can scale the graph
         self.yLimits = [0, 0]
         self.xLimits = [0, 0]
 
         # hold the current min and max limits for the y axis
+        # this keeps track of the values the sliders are at
         self.minY = 0
         self.maxY = 0
         self.minX = 0
