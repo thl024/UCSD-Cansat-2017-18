@@ -284,6 +284,7 @@ class Wrapper():
     # change the max range of the y axis using slider
     def maxSliderChange(self, slider):
         newMaxValue = slider.value()
+        axes = self.ui.figure.gca()
         # slider for Y Max
         if (slider == self.ui.horizontalSlider_2):
             self.maxY = newMaxValue / 100.0 * self.yLimits[1]
@@ -301,6 +302,7 @@ class Wrapper():
     # change the min range of the y axis using slider
     def minSliderChange(self, slider):
         newMinValue = slider.value()
+        axes = self.ui.figure.gca()
         # Slider for Y Min
         if (slider == self.ui.horizontalSlider):
             self.minY = newMinValue / 100.0 * self.yLimits[1]
@@ -315,6 +317,7 @@ class Wrapper():
                 slider.setValue(self.ui.horizontalSlider_4.value())
 
         warnings.filterwarnings("ignore",module="matplotlib")
+        self.updateLimits()
         self.update_plot_controls()
         
     def getCurrentPlot(self):
@@ -360,6 +363,8 @@ class Wrapper():
     def update_plot_controls(self):
         self.ui.textEdit_3.setText(str(int(self.minY)))
         self.ui.textEdit_4.setText(str(int(self.maxY)))
+        self.ui.textEdit.setText(str(int(self.minX)))
+        self.ui.textEdit_2.setText(str(int(self.maxX)))
 
 # Instantiate UI
 if __name__ == "__main__":
