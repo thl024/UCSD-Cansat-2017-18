@@ -28,6 +28,9 @@ class Wrapper():
         self.ax = None
         self.xbee_communicator = xbee_communicator
 
+        # reference to 3d plot
+        self.plot3d = None
+
         # hold the smallest min and largest max limits for the y axis
         # this lets us know the highest or lowest we can scale the graph
         self.yLimits = [0, 0]
@@ -59,9 +62,12 @@ class Wrapper():
 
     def codeUpdatesToUI(self):
         self.ui.figure = Figure()
-        self.ui.canvas = FigureCanvas(ui.figure)
+        self.ui.canvas = FigureCanvas(self.ui.figure)
         self.ui.canvas.setObjectName("gridCanvas")
+        # add the plot to the main layout
         self.ui.gridLayout.addWidget(ui.canvas, 0, 0, 1, 1)
+        # add a plot to the sub layout
+        # self.ui.gridLayout_2.addWidget(NEW UI.CANVAS HERE FOR 3D, 0, 0, 1, 1)
 
     def initNewUI(self):
 
