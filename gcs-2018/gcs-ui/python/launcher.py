@@ -92,7 +92,7 @@ class Wrapper():
             self.plot(data, "Time", self.currentPlot)
 
             # plot 3d
-            self.plotOrientation(0, 0, 0, 0.8, 0.8, 0.8)
+            self.plotOrientation(0, 0, 0, 0.2, -0.4, 1.8)
 
             # Update plot controls
             self.update_plot_controls()
@@ -165,8 +165,13 @@ class Wrapper():
         self.ui.canvas.draw()
 
     # plots 3d
+    # use u v w for orientation/direction of arrow
+    # x y z is for initial position of tail
     def plotOrientation(self, x, y, z, u, v, w):
         ax = self.ui.figure2.add_subplot(111, projection = "3d")
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_zlabel("z")
         ax.quiver(x, y, z, u, v, w)
         ax.set_xlim([-1, 1])
         ax.set_ylim([-1, 1.5])
