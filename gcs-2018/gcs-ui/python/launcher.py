@@ -92,9 +92,7 @@ class Wrapper():
             self.plot(data, "Time", self.currentPlot)
 
             # plot 3d
-            ax = self.ui.figure2.add_subplot(111, projection = "3d")
-            ax.quiver(1, 1, 1, 1, 1, 1)
-            self.ui.canvas2.draw()
+            self.plotOrientation(0, 0, 0, 0.8, 0.8, 0.8)
 
             # Update plot controls
             self.update_plot_controls()
@@ -151,15 +149,6 @@ class Wrapper():
 
         self.ui.canvas.draw()
 
-        """
-        correctly plots data in smaller plot, used for testing
-        ax2 = self.ui.figure2.add_subplot(111)
-        ax2.plot(data[x].astype(float), data[y].astype(float),
-            color = "xkcd:teal")
-
-        self.ui.canvas2.draw()
-        """
-
     # plots new points 
     def plot_points(self, data, x, y):
         self.ax.plot(data[x].tail(2).astype(float), 
@@ -176,9 +165,12 @@ class Wrapper():
         self.ui.canvas.draw()
 
     # plots 3d
-    def plot3d(self):
+    def plotOrientation(self, x, y, z, u, v, w):
         ax = self.ui.figure2.add_subplot(111, projection = "3d")
-        ax.quiver(1, 1, 1, 1, 1, 1)
+        ax.quiver(x, y, z, u, v, w)
+        ax.set_xlim([-1, 1])
+        ax.set_ylim([-1, 1.5])
+        ax.set_zlim([-1, 2])
         self.ui.canvas2.draw()
 
     # Update values below graph
