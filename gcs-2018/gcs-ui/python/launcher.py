@@ -12,6 +12,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
+from mpl_toolkits.mplot3d import Axes3D
+
 from random import randint
 from datetime import datetime
 
@@ -65,9 +67,13 @@ class Wrapper():
         self.ui.canvas = FigureCanvas(self.ui.figure)
         self.ui.canvas.setObjectName("gridCanvas")
         # add the plot to the main layout
-        self.ui.gridLayout.addWidget(ui.canvas, 0, 0, 1, 1)
+        self.ui.gridLayout.addWidget(self.ui.canvas, 0, 0, 1, 1)
+
         # add a plot to the sub layout
-        # self.ui.gridLayout_2.addWidget(NEW UI.CANVAS HERE FOR 3D, 0, 0, 1, 1)
+        self.ui.figure2 = Figure()
+        self.ui.canvas2 = FigureCanvas(self.ui.figure2)
+        self.ui.canvas2.setObjectName("gridCanvas2")
+        self.ui.gridLayout_2.addWidget(self.ui.canvas2, 0, 0, 1, 1)
 
     def initNewUI(self):
 
@@ -84,6 +90,11 @@ class Wrapper():
             # Plot initial data
             data = self.dataloader.fetch(["Time", self.currentPlot])
             self.plot(data, "Time", self.currentPlot)
+
+            # plot 3d
+            ax = self.ui.figure2.add_subplot(111, projection = "3d")
+            ax.quiver(1, 1, 1, 1, 1, 1)
+            self.ui.canvas2.draw()
 
             # Update plot controls
             self.update_plot_controls()
@@ -137,6 +148,15 @@ class Wrapper():
 
         self.ui.canvas.draw()
 
+        """
+        correctly plots data in smaller plot, used for testing
+        ax2 = self.ui.figure2.add_subplot(111)
+        ax2.plot(data[x].astype(float), data[y].astype(float),
+            color = "xkcd:teal")
+
+        self.ui.canvas2.draw()
+        """
+
     # plots new points 
     def plot_points(self, data, x, y):
         self.ax.plot(data[x].tail(2).astype(float), 
@@ -151,6 +171,12 @@ class Wrapper():
     def plotClear(self):
         self.ax.clear()
         self.ui.canvas.draw()
+
+    # plots 3d
+    def plot3d(self):
+        ax = self.ui.figure2.add_subplot(111, projection = "3d")
+        ax.quiver(1, 1, 1, 1, 1, 1)
+        self.ui.canvas2.draw()
 
     # Update values below graph
     # dataType is Velocity, Altitude, Temp, etc
