@@ -20,6 +20,20 @@ import warnings
 HEADERS = ["TeamID", "Time", "Packet", "Altitude", "Pressure", "Airspeed", "Temperature", "Voltage", "Latitude", "Longitude",
 "GPSAlt", "Satellites", "GPSSpeed", "Heading", "ImageCount", "State"]
 
+# Values below graph
+v1 = "Time"
+v2 = "Altitude"
+v3 = "GPSSpeed"
+v4 = "Airspeed"
+v5 = "Temperature"
+
+# Values below graph - units
+v1_u = "s"
+v2_u = "m"
+v3_u = "mph"
+v4_u = "mph"
+v5_u = "°F"
+
 
 class Wrapper():
 
@@ -154,17 +168,6 @@ class Wrapper():
     def plotClear(self):
         self.ax.clear()
         self.ui.canvas.draw()
-
-    # Update values below graph
-    # dataType is Velocity, Altitude, Temp, etc
-    # Pass in "all" to update all data types
-    def updateValues(self, data, dataType):
-        self.ui.label_11.setText(str(dataType))
-        # self.ui.label_11 is Time
-        # self.ui.label_9 is Altitude
-        # self.ui.label_6 is Velocity
-        # self.ui.label_5 is Wind Speed
-        # self.ui.label_4 is Pressure
 
     # Connects buttons to given functions
     def setUpHandlers(self):
@@ -377,12 +380,17 @@ class Wrapper():
         self.ui.textEdit_2.setText(str(int(self.maxX)))
 
     def update_text_vals(self):
-        txt_data = self.dataloader.fetch(["Time", "Altitude", "GPSSpeed", "Airspeed", "Temperature"])
-        self.ui.label_11.setText(str(txt_data["Time"].iloc[-1]))
-        self.ui.label_9.setText(str(txt_data["Altitude"].iloc[-1]))
-        self.ui.label_6.setText(str(txt_data["GPSSpeed"].iloc[-1]))
-        self.ui.label_5.setText(str(txt_data["Airspeed"].iloc[-1]))
-        self.ui.label_4.setText(str(txt_data["Temperature"].iloc[-1]))
+        txt_data = self.dataloader.fetch([v1, v2, v3, v4, v5])
+        t1 = str(txt_data[v1].iloc[-1]) + v1_u if len(txt_data[v1]) > 1 else "N/A"
+        t2 = str(txt_data[v2].iloc[-1]) + v2_u if len(txt_data[v1]) > 1 else "N/A"
+        t3 = str(txt_data[v3].iloc[-1]) + v3_u if len(txt_data[v1]) > 1 else "N/A"
+        t4 = str(txt_data[v4].iloc[-1]) + v4_u if len(txt_data[v1]) > 1 else "N/A"
+        t5 = str(txt_data[v5].iloc[-1]) + v5_u if len(txt_data[v1]) > 1 else "N/A"
+        self.ui.label_11.setText(t1)
+        self.ui.label_9.setText(t2)
+        self.ui.label_6.setText(t3)
+        self.ui.label_5.setText(t4)
+        self.ui.label_4.setText(t5)
 
 # Instantiate UI
 if __name__ == "__main__":
