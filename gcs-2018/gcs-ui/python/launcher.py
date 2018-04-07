@@ -103,18 +103,23 @@ class Wrapper():
 
             # Plot initial data
             data = self.dataloader.fetch(["Time", self.currentPlot])
+
+            # Compute new limits
+            self.compute_plot_limits(data)
+
+            # Update limits
+            self.update_plot_limits()
+
+            # Update plot controls
+            self.update_plot_controls()
+
+            # Plot
             self.plot(data, "Time", self.currentPlot)
 
             # plot 3d
             ax = self.ui.figure2.add_subplot(111, projection = "3d")
             ax.quiver(1, 1, 1, 1, 1, 1)
             self.ui.canvas2.draw()
-
-            # Update plot controls
-            self.update_plot_controls()
-
-            # Update limits
-            self.updateLimits()
 
             # Update text vals
             self.update_text_vals()
@@ -123,27 +128,34 @@ class Wrapper():
             # Update session name
             self.update_session_name("No File Loaded")
 
+    def compute_plot_limits(self, data):
+        if not data.empty:
+            self.maxX = int(data["Time"].max())
+            self.maxY = int(data[self.currentPlot].max()) + 1
+            self.minX = int(data["Time"].min())
+            self.minY = int(data[self.currentPlot].min()) + 1
+        else:
+            self.maxX = 10
+            self.maxY = 10
+            self.minX = 0
+            self.minY = 0
 
-            # TODO SET THE LIMITS OUTSIDE OF PLOT.. ONLY RELY ON THE DATA!
-    def setYLimits(self):
-        yLim = self.ui.figure.gca().get_ylim()
-        if (yLim[0] < self.yLimits[0]):
-            self.yLimits[0] = yLim[0]
-        if (yLim[1] > self.yLimits[1]):
-            self.yLimits[1] = yLim[1]
+    def update_plot_limits(self):
+        axes = self.ui.figure.gca()
+        axes.set_xlim([self.minX, self.maxX])
+        axes.set_ylim([self.minY, self.maxY])
+        self.ui.canvas.draw()
 
-        self.minY = self.yLimits[0]
-        self.maxY = self.yLimits[1]
-        
-    def setXLimits(self):
-        xLim = self.ui.figure.gca().get_xlim()
-        if (xLim[0] < self.xLimits[0]):
-            self.xLimits[0] = xLim[0]
-        if (xLim[1] > self.xLimits[1]):
-            self.xLimits[1] = xLim[1]
+    def update_plot_controls(self):
+        self.ui.textEdit_3.setText(str(self.minY))
+        self.ui.textEdit_4.setText(str(self.maxY))
+        self.ui.textEdit.setText(str(self.minX))
+        self.ui.textEdit_2.setText(str(self.maxX))
 
-        self.minX = self.xLimits[0]
-        self.maxX = self.xLimits[1]
+        self.ui.horizontalSlider.setValue(self.minY)
+        self.ui.horizontalSlider_3.setValue(self.minX)
+        self.ui.horizontalSlider_2.setValue(self.maxY)
+        self.ui.horizontalSlider_4.setValue(self.maxX)
 
     # plot the data
     """
@@ -159,10 +171,6 @@ class Wrapper():
         self.ax.set_xlabel(x)
         self.ax.set_ylabel(y)
         self.ax.grid()
-        
-        self.setXLimits()
-        self.setYLimits()
-
         self.ui.canvas.draw()
 
         """
@@ -194,7 +202,7 @@ class Wrapper():
         ax = self.ui.figure2.add_subplot(111, projection = "3d")
         ax.quiver(1, 1, 1, 1, 1, 1)
         self.ui.canvas2.draw()
-        
+
     # Connects buttons to given functions
     def setUpHandlers(self):
         self.ui.actionConnect.triggered.connect(self.select_port)
@@ -266,8 +274,22 @@ class Wrapper():
         x = "Time"
         y = self.currentPlot
 
+        # Fetch data
         data = self.dataloader.fetch([x, y])
+        
+        # Compute new limits
+        self.compute_plot_limits(data)
+
+        # Update limits
+        self.update_plot_limits()
+
+        # Update plot controls
+        self.update_plot_controls()
+
+        # Update plot
         self.plot_points(data, x, y)
+
+        # Update text below graph
         self.update_text_vals()
 
     def select_port(self):
@@ -312,51 +334,67 @@ class Wrapper():
             warnings.filterwarnings("ignore",module="matplotlib")
             self.plotClear()
             self.plot(data, "Time", self.currentPlot)
-            self.updateLimits()
 
-    def updateLimits(self):
-        axes = self.ui.figure.gca()
-        axes.set_xlim([self.minX, self.maxX])
-        axes.set_ylim([self.minY, self.maxY])
-        self.ui.canvas.draw()
+            # Compute new limits
+            self.compute_plot_limits(data)
+
+            # Update limits
+            self.update_plot_limits()
+
+            # Update plot controls
+            self.update_plot_controls()
 
     # change the max range of the y axis using slider
     def maxSliderChange(self, slider):
         newMaxValue = slider.value()
         axes = self.ui.figure.gca()
+        update = True
+
         # slider for Y Max
         if (slider == self.ui.horizontalSlider_2):
-            self.maxY = newMaxValue / 100.0 * self.yLimits[1]
-            if (self.ui.horizontalSlider.value() > slider.value()):
-                slider.setValue(self.ui.horizontalSlider.value())
+            if self.minY < newMaxValue:
+                self.maxY = newMaxValue
+            else:
+                update = False
         # slider for X Max
         else:
-            self.maxX = newMaxValue / 100.0 * self.xLimits[1]
-            if (self.ui.horizontalSlider_3.value() > slider.value()):
-                slider.setValue(self.ui.horizontalSlider_3.value())
+            if self.minX < newMaxValue:
+                self.maxX = newMaxValue
+            else:
+                update = False
         warnings.filterwarnings("ignore",module="matplotlib")
-        self.updateLimits()
+        
+        if update:
+            # Update plot limits and control limits
+            self.update_plot_limits()
+
         self.update_plot_controls()
 
     # change the min range of the y axis using slider
     def minSliderChange(self, slider):
         newMinValue = slider.value()
         axes = self.ui.figure.gca()
+        update = True
+
         # Slider for Y Min
         if (slider == self.ui.horizontalSlider):
-            self.minY = newMinValue / 100.0 * self.yLimits[1]
-            axes.set_ylim([self.minY, self.maxY])
-            if (self.ui.horizontalSlider_2.value() < slider.value()):
-                slider.setValue(self.ui.horizontalSlider_2.value())
+            if newMinValue < self.maxY:
+                self.minY = newMinValue
+            else:
+                update = False
         # Slider for X Min
         else:
-            self.minX = newMinValue / 100.0 * self.xLimits[1]
-            axes.set_xlim([self.minX, self.maxX])
-            if (self.ui.horizontalSlider_4.value() < slider.value()):
-                slider.setValue(self.ui.horizontalSlider_4.value())
+            if newMinValue < self.maxX:
+                self.minX = newMinValue
+            else:
+                update = False
 
         warnings.filterwarnings("ignore",module="matplotlib")
-        self.updateLimits()
+        
+        if update:
+            # Update plot limits and control limits
+            self.update_plot_limits()
+
         self.update_plot_controls()
         
     def getCurrentPlot(self):
@@ -398,12 +436,6 @@ class Wrapper():
 
     def update_session_name(self, name):
         self.ui.session_label.setText(name)
-
-    def update_plot_controls(self):
-        self.ui.textEdit_3.setText(str(int(self.minY)))
-        self.ui.textEdit_4.setText(str(int(self.maxY)))
-        self.ui.textEdit.setText(str(int(self.minX)))
-        self.ui.textEdit_2.setText(str(int(self.maxX)))
 
     def update_text_vals(self):
         txt_data = self.dataloader.fetch([v1, v2, v3, v4, v5])
