@@ -102,6 +102,9 @@ class Wrapper():
             # Update limits
             self.updateLimits()
 
+            # Update text vals
+            self.update_text_vals()
+
         else:
             # Update session name
             self.update_session_name("No File Loaded")
@@ -262,6 +265,7 @@ class Wrapper():
 
         data = self.dataloader.fetch([x, y])
         self.plot_points(data, x, y)
+        self.update_text_vals()
 
     def select_port(self):
         valid = False
@@ -397,6 +401,14 @@ class Wrapper():
         self.ui.textEdit_4.setText(str(int(self.maxY)))
         self.ui.textEdit.setText(str(int(self.minX)))
         self.ui.textEdit_2.setText(str(int(self.maxX)))
+
+    def update_text_vals(self):
+        txt_data = self.dataloader.fetch(["Time", "Altitude", "GPSSpeed", "Airspeed", "Temperature"])
+        self.ui.label_11.setText(str(txt_data["Time"].iloc[-1]))
+        self.ui.label_9.setText(str(txt_data["Altitude"].iloc[-1]))
+        self.ui.label_6.setText(str(txt_data["GPSSpeed"].iloc[-1]))
+        self.ui.label_5.setText(str(txt_data["Airspeed"].iloc[-1]))
+        self.ui.label_4.setText(str(txt_data["Temperature"].iloc[-1]))
 
 # Instantiate UI
 if __name__ == "__main__":
