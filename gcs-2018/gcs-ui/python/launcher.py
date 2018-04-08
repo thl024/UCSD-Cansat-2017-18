@@ -63,7 +63,7 @@ class Wrapper():
         self.ui.comboBox.clear()
         # self.ui.comboBox.addItem("All")
         # should create separate array of items we want to plot
-        self.ui.comboBox.addItems(HEADERS)
+        self.ui.comboBox.addItems(HEADERS[2:])
 
         self.ui.horizontalSlider_2.setValue(100)
         self.ui.horizontalSlider_4.setValue(100)
@@ -111,7 +111,7 @@ class Wrapper():
             self.update_plot_limits()
 
             # Update plot controls
-            self.update_plot_controls()
+            self.update_plot_controls(True)
 
             # Plot
             self.plot(data, "Time", self.currentPlot)
@@ -127,6 +127,9 @@ class Wrapper():
             self.update_session_name("No File Loaded")
 
     def compute_plot_limits(self, data):
+        
+        data = data.astype(float)
+
         if not data.empty:
             self.maxX = int(data["Time"].max())
             self.maxY = int(data[self.currentPlot].max()) + 1
@@ -144,16 +147,27 @@ class Wrapper():
         axes.set_ylim([self.minY, self.maxY])
         self.ui.canvas.draw()
 
-    def update_plot_controls(self):
-        self.ui.textEdit_3.setText(str(self.minY))
-        self.ui.textEdit_4.setText(str(self.maxY))
-        self.ui.textEdit.setText(str(self.minX))
-        self.ui.textEdit_2.setText(str(self.maxX))
+    def update_plot_controls(self, set_slider_max):
 
-        self.ui.horizontalSlider.setValue(self.minY)
-        self.ui.horizontalSlider_3.setValue(self.minX)
-        self.ui.horizontalSlider_2.setValue(self.maxY)
-        self.ui.horizontalSlider_4.setValue(self.maxX)
+        minVals = [self.minX, self.minY]
+        maxVals = [self.maxX, self.maxY]
+        mintxtedits = [self.ui.textEdit, self.ui.textEdit_3]
+        maxtxtedits = [self.ui.textEdit_2, self.ui.textEdit_4]
+        minsliders = [self.ui.horizontalSlider_3, self.ui.horizontalSlider]
+        maxsliders = [self.ui.horizontalSlider_4, self.ui.horizontalSlider_2]
+
+        for minval, minte, minslider, maxval, maxte, maxslider in zip(minVals, mintxtedits, minsliders, maxVals, maxtxtedits, maxsliders):
+            minte.setText(str(minval))
+            maxte.setText(str(maxval))
+
+            if set_slider_max:
+                minslider.setMinimum(minval)
+                minslider.setMaximum(maxval)
+                maxslider.setMinimum(minval)
+                maxslider.setMaximum(maxval)
+
+            minslider.setValue(minval)
+            maxslider.setValue(maxval)
 
     # plot the data
     """
@@ -266,6 +280,7 @@ class Wrapper():
         if self.dataloader is None:
             print("Error: Session has not been started")
             return
+
         self.dataloader.update(HEADERS, data_row)
 
         x = "Time"
@@ -281,7 +296,9 @@ class Wrapper():
         self.update_plot_limits()
 
         # Update plot controls
-        self.update_plot_controls()
+        self.update_plot_controls(True)
+
+        print("here")
 
         # Update plot
         self.plot_points(data, x, y)
@@ -339,60 +356,46 @@ class Wrapper():
             self.update_plot_limits()
 
             # Update plot controls
-            self.update_plot_controls()
+            self.update_plot_controls(True)
 
     # change the max range of the y axis using slider
     def maxSliderChange(self, slider):
         newMaxValue = slider.value()
         axes = self.ui.figure.gca()
-        update = True
 
         # slider for Y Max
         if (slider == self.ui.horizontalSlider_2):
             if self.minY < newMaxValue:
                 self.maxY = newMaxValue
-            else:
-                update = False
+                self.update_plot_limits()
         # slider for X Max
         else:
             if self.minX < newMaxValue:
                 self.maxX = newMaxValue
-            else:
-                update = False
+                self.update_plot_limits()
         warnings.filterwarnings("ignore",module="matplotlib")
-        
-        if update:
-            # Update plot limits and control limits
-            self.update_plot_limits()
 
-        self.update_plot_controls()
+        self.update_plot_controls(False)
 
     # change the min range of the y axis using slider
     def minSliderChange(self, slider):
         newMinValue = slider.value()
         axes = self.ui.figure.gca()
-        update = True
 
         # Slider for Y Min
         if (slider == self.ui.horizontalSlider):
             if newMinValue < self.maxY:
                 self.minY = newMinValue
-            else:
-                update = False
+                self.update_plot_limits()
         # Slider for X Min
         else:
             if newMinValue < self.maxX:
                 self.minX = newMinValue
-            else:
-                update = False
+                self.update_plot_limits()
 
         warnings.filterwarnings("ignore",module="matplotlib")
-        
-        if update:
-            # Update plot limits and control limits
-            self.update_plot_limits()
-
-        self.update_plot_controls()
+            
+        self.update_plot_controls(False)
         
     def getCurrentPlot(self):
         return self.currentPlot
@@ -412,10 +415,7 @@ class Wrapper():
     def yesno_prompt(self, title, msg):
         reply = QtWidgets.QMessageBox.question(self.ui.mainwindow, title, 
                  msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.Yes:
-            return True
-        else:
-            return False   
+        return True if reply == QtWidgets.QMessageBox.Yes else False
 
     def openFileNameDialog(self):    
         options = QtWidgets.QFileDialog.Options()
@@ -435,17 +435,11 @@ class Wrapper():
         self.ui.session_label.setText(name)
 
     def update_text_vals(self):
-        txt_data = self.dataloader.fetch([v1, v2, v3, v4, v5])
-        t1 = str(txt_data[v1].iloc[-1]) + v1_u if len(txt_data[v1]) > 1 else "N/A"
-        t2 = str(txt_data[v2].iloc[-1]) + v2_u if len(txt_data[v1]) > 1 else "N/A"
-        t3 = str(txt_data[v3].iloc[-1]) + v3_u if len(txt_data[v1]) > 1 else "N/A"
-        t4 = str(txt_data[v4].iloc[-1]) + v4_u if len(txt_data[v1]) > 1 else "N/A"
-        t5 = str(txt_data[v5].iloc[-1]) + v5_u if len(txt_data[v1]) > 1 else "N/A"
-        self.ui.label_11.setText(t1)
-        self.ui.label_9.setText(t2)
-        self.ui.label_6.setText(t3)
-        self.ui.label_5.setText(t4)
-        self.ui.label_4.setText(t5)
+        label_order = [self.ui.label_11, self.ui.label_9, self.ui.label_6, self.ui.label_5, self.ui.label_4]
+        for field, unit, label in zip([v1, v2, v3, v4, v5], [v1_u, v2_u, v3_u, v4_u, v5_u], label_order):
+            txt_data = self.dataloader.fetch([field])
+            text = str(txt_data[field].iloc[-1]) + unit if len(txt_data[field]) > 1 else "N/A"
+            label.setText(text)
 
 # Instantiate UI
 if __name__ == "__main__":
