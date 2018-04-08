@@ -1,13 +1,15 @@
 import serial
 import time
-from threading import Thread
 from random import randint
+
+from PyQt5.QtCore import pyqtSignal, QThread
 
 class XBeeCommunicator():
 
     def __init__(self):
         self.connected = False
         self.ser = None
+        self.xbee_thread = None
         pass
 
     def connect(self, port):
@@ -22,14 +24,11 @@ class XBeeCommunicator():
         except:
             return False
 
-    def start(self, threaded_function):
+    def start(self, callback):
         if not self.connected:
            return False
-
-        # Begin reading - create a threaded process
-        self.keep_threading = True
-        thread = Thread(target = self.receive_data_threaded, args = [threaded_function])
-        thread.start()
+        
+        self.begin_thread(callback)
 
         print("Starting XBee Connection")
         return True
@@ -38,15 +37,14 @@ class XBeeCommunicator():
         if not self.connected:
            return False
 
-        # Stop reading
-        self.keep_threading = False
+        self.stop_thread()
 
         print("Pausing XBee Connection")
         return True
 
     def stop(self):
         self.connected = False
-        self.keep_threading = False
+        self.stop_thread()
 
         # Close connection
         # if self.ser:
@@ -65,17 +63,28 @@ class XBeeCommunicator():
         print("Snapshot Taken")
         return True
 
-    def receive_data_threaded(self, threaded_function):
+    def begin_thread(self, callback):
+        self.xbee_thread = XBeeThread()
+        self.xbee_thread.update.connect(callback)
+        self.xbee_thread.start()
 
-        while (self.keep_threading):
+    def stop_thread(self):
+        self.xbee_thread.stop = True
 
+
+class XBeeThread(QThread):
+    update = pyqtSignal(list)
+    stop = False
+
+    def run(self):
+        while not self.stop:
             # with serial.Serial('/dev/ttyS1', 19200, timeout=1) as ser:
             #     x = ser.read()          # read one byte
             #     s = ser.read(10)        # read up to ten bytes (timeout)
             #     line = ser.readline()   # read a '\n' terminated line
 
             randdata = [randint(0, 300) for n in range(0, 16)]
-            threaded_function(randdata)
+            self.update.emit(randdata)
             time.sleep(3)
 
-            pass
+        pass

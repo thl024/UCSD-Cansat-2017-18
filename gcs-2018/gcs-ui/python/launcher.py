@@ -189,10 +189,6 @@ class Wrapper():
     def plot_points(self, data, x, y):
         self.ax.plot(data[x].tail(2).astype(float), 
             data[y].tail(2).astype(float), color = "xkcd:teal")
-
-        self.setXLimits()
-        self.setYLimits()
-
         self.ui.canvas.draw()
 
     # Clear the plot
