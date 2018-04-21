@@ -42,10 +42,8 @@ class Wrapper():
     def __init__(self, ui, xbee_communicator, dataloader=None):
         self.ui = ui
         self.ax = None
+        self.ax2 = None
         self.xbee_communicator = xbee_communicator
-
-        # reference to 3d plot
-        self.plot3d = None
 
         # hold the smallest min and largest max limits for the y axis
         # this lets us know the highest or lowest we can scale the graph
@@ -82,12 +80,14 @@ class Wrapper():
         self.ui.canvas.setObjectName("gridCanvas")
         # add the plot to the main layout
         self.ui.gridLayout.addWidget(self.ui.canvas, 0, 0, 1, 1)
+        self.ax = self.ui.figure.add_subplot(111)
 
         # add a plot to the sub layout
         self.ui.figure2 = Figure()
         self.ui.canvas2 = FigureCanvas(self.ui.figure2)
         self.ui.canvas2.setObjectName("gridCanvas2")
         self.ui.gridLayout_2.addWidget(self.ui.canvas2, 0, 0, 1, 1)
+        self.ax2 = self.ui.figure2.add_subplot(111, projection = "3d")
 
     def initNewUI(self):
 
@@ -118,6 +118,10 @@ class Wrapper():
 
             # plot 3d
             self.plotOrientation(0, 0, 0, 0.2, -0.4, 1.8)
+            self.plotClearOrientation()
+            self.plotOrientation(0, 0, 0, 0.8, 0.1, .8)
+            self.plotClearOrientation()
+            self.plotOrientation(0, 0, 0, 1, 1, 1)
 
             # Update text vals
             self.update_text_vals()
@@ -176,7 +180,7 @@ class Wrapper():
     set x axis to Time and y axis to altitude
     """
     def plot(self, data, x, y):
-        self.ax = self.ui.figure.add_subplot(111)
+        #self.ax = self.ui.figure.add_subplot(111)
         self.ax.plot(data[x].astype(float), data[y].astype(float),
             color = "xkcd:teal")
         self.ax.set_title("{} vs {}".format(x, y))
@@ -200,14 +204,19 @@ class Wrapper():
     # use u v w for orientation/direction of arrow
     # x y z is for initial position of tail
     def plotOrientation(self, x, y, z, u, v, w):
-        ax = self.ui.figure2.add_subplot(111, projection = "3d")
-        ax.set_xlabel("x")
-        ax.set_ylabel("y")
-        ax.set_zlabel("z")
-        ax.quiver(x, y, z, u, v, w)
-        ax.set_xlim([-1, 1])
-        ax.set_ylim([-1, 1.5])
-        ax.set_zlim([-1, 2])
+        #self.ax2 = self.ui.figure2.add_subplot(111, projection = "3d")
+        self.ax2.set_xlabel("x")
+        self.ax2.set_ylabel("y")
+        self.ax2.set_zlabel("z")
+        self.ax2.quiver(x, y, z, u, v, w)
+        self.ax2.set_xlim([-1, 1])
+        self.ax2.set_ylim([-1, 1.5])
+        self.ax2.set_zlim([-1, 2])
+        self.ui.canvas2.draw()
+
+    # Clear the 3d plot for orientation
+    def plotClearOrientation(self):
+        self.ax2.clear()
         self.ui.canvas2.draw()
 
     # Connects buttons to given functions
